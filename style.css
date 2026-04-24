@@ -2042,6 +2042,79 @@ input[type=range] {
         gap: 5px !important;
         margin-bottom: 8px !important;
     }
+
+    /* [New] 훈련/업그레이드 리스트 2열 그리드화 */
+    .upgrade-list {
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 6px !important;
+        padding: 5px !important;
+    }
+
+    .upgrade-btn {
+        flex-direction: column !important;
+        padding: 6px !important;
+        height: auto !important;
+        min-height: 70px !important;
+        align-items: center !important;
+        text-align: center !important;
+        gap: 2px !important;
+        border-radius: 8px !important;
+    }
+
+    .upgrade-btn .up-info {
+        flex-direction: column !important;
+        align-items: center !important;
+        gap: 1px !important;
+    }
+
+    .up-name {
+        font-size: 11px !important;
+        font-weight: 800 !important;
+    }
+
+    .up-dpm {
+        font-size: 8px !important;
+        opacity: 0.6;
+    }
+
+    .up-effect {
+        font-size: 10px !important;
+        color: var(--accent-cyan) !important;
+        margin: 1px 0 !important;
+    }
+
+    .up-cost {
+        font-size: 9px !important;
+        background: rgba(0,0,0,0.4) !important;
+        padding: 2px 4px !important;
+        border-radius: 3px !important;
+        white-space: nowrap;
+    }
+
+    /* 서브 탭 메뉴(상점, 제작 등) 높이 축소 */
+    .action-tabs {
+        height: 36px !important;
+        gap: 2px !important;
+    }
+
+    .tab-btn {
+        font-size: 11px !important;
+        padding: 0 4px !important;
+    }
+
+    /* 생산 업그레이드(파견 강화)는 가로 길게 유지하되 높이 축소 */
+    .upgrade-btn.prod-up {
+        grid-column: span 2 !important;
+        flex-direction: row !important;
+        min-height: 45px !important;
+        justify-content: space-between !important;
+        text-align: left !important;
+    }
+    
+    .upgrade-btn.prod-up .up-info {
+        align-items: flex-start !important;
+    }
 }
 
 /* 데스크톱에서는 하단 바 숨김 */
