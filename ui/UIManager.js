@@ -127,6 +127,11 @@ export class UIManager {
     
     // [New] 배경 선택 버튼
     this.bgChoiceBtns = document.querySelectorAll('.bg-choice-btn');
+
+    // [New] 모바일 접속 시 초기 화면 설정 (맵 하단에 상태창 기본 표시)
+    if (window.innerWidth <= 1024) {
+        setTimeout(() => this.toggleMobilePanel('left-sidebar'), 100);
+    }
   }
 
   initEvents() {
@@ -2513,5 +2518,75 @@ export class UIManager {
     noBtn.onclick = () => {
         close();
     };
+  }
+
+  /**
+   * [New] 모바일 전용 패널 토글 로직
+   */
+  toggleMobilePanel(panelId) {
+    const leftSidebar = document.getElementById('left-sidebar');
+    const rightSidebar = document.getElementById('right-sidebar');
+    const settingsModal = document.getElementById('settings-modal');
+
+    // 모든 패널 초기화 (숨김)
+    const hideAll = () => {
+        leftSidebar.classList.remove('active');
+        rightSidebar.classList.remove('active');
+        settingsModal.classList.remove('active');
+        // 데스크톱 호환을 위해 hidden 클래스도 제어 (모바일은 active로 제어)
+        settingsModal.classList.add('hidden'); 
+    };
+
+    // 1. 설정 모달 처리
+    if (panelId === 'settings-modal') {
+        const isCurrentlyActive = settingsModal.classList.contains('active');
+        hideAll();
+        if (!isCurrentlyActive) {
+            settingsModal.classList.add('active');
+            settingsModal.classList.remove('hidden');
+        }
+        SoundManager.playClick();
+        return;
+    }
+
+    // 2. 탭 전환 연동 처리 (상점, 제작, 훈련 등)
+    if (panelId.startsWith('tab-')) {
+        const tabName = panelId.replace('tab-', '');
+        this.switchTab(tabName);
+        
+        hideAll();
+        rightSidebar.classList.add('active');
+    } else if (panelId === 'left-sidebar') {
+        // 왼쪽 사이드바 (상태창) 열기
+        hideAll();
+        leftSidebar.classList.add('active');
+        this.switchSubTab('status-main');
+    }
+
+    // [Sound] 클릭 효과음
+    SoundManager.playClick();
+  }
+
+  /**
+   * [New] 상태창 내부 서브 탭 전환 로직
+   */
+  switchSubTab(subTabId) {
+    const sidebar = document.getElementById('left-sidebar');
+    if (!sidebar) return;
+
+    // 버튼 활성화 상태 변경
+    const btns = sidebar.querySelectorAll('.sub-tab-btn');
+    btns.forEach(btn => {
+        btn.classList.toggle('active', btn.getAttribute('data-sub') === subTabId);
+    });
+
+    // 패널 표시 상태 변경
+    const panes = sidebar.querySelectorAll('.sub-tab-pane');
+    panes.forEach(pane => {
+        pane.classList.toggle('active', pane.id === `sub-tab-${subTabId}`);
+    });
+
+    // [Sound] 클릭 효과음
+    SoundManager.playClick();
   }
 }

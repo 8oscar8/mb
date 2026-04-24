@@ -11,173 +11,165 @@
 </head>
 <body class="dark-theme">
     <div id="app-container">
-        <!-- 1. 왼쪽 사이드바: 정착지 상태 -->
+        <!-- 1. 왼쪽 사이드바: 정착지 상태 (서브 탭 시스템 적용) -->
         <aside id="left-sidebar" class="sidebar glass-panel">
-            <div class="speed-control-container">
-                <div class="speed-controls">
-                    <button class="speed-btn active">x1 [1]</button>
-                    <button class="speed-btn">x2 [2]</button>
-                    <button class="speed-btn">x4 [3]</button>
-                    <button id="btn-pause" class="speed-btn">일시정지 [SPACE]</button>
-                </div>
+            <!-- [New] 상태창 내부 서브 탭 메뉴 (모바일 전용) -->
+            <div class="sub-tab-menu mobile-only">
+                <button class="sub-tab-btn active" data-sub="status-main" onclick="window.app.ui.switchSubTab('status-main')">진행</button>
+                <button class="sub-tab-btn" data-sub="status-resources" onclick="window.app.ui.switchSubTab('status-resources')">자원</button>
+                <button class="sub-tab-btn" data-sub="status-items" onclick="window.app.ui.switchSubTab('status-items')">아이템</button>
             </div>
 
-            <div class="status-section">
-                <h3 class="section-title">정착지 상태</h3>
-                
-                <div class="status-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'wave')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                    <span class="label">웨이브</span>
-                    <span class="value"><span id="wave-val">1</span> / 100</span>
-                </div>
-                <div class="status-card">
-                    <span class="label">다음 웨이브</span>
-                    <span class="value" id="timer-val">01:59</span>
-                </div>
-                <div class="status-card highlight" onmouseenter="window.app.ui.showResourceTooltip(event, 'population')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                    <span class="label">인구</span>
-                    <span class="value" id="pop-val">3</span>
-                </div>
-                <div class="status-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'enemyCount')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                    <span class="label">적 수</span>
-                    <span class="value" id="enemy-val">0 / 100</span>
-                </div>
-                <div class="status-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'silver')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                    <span class="label"><img src="assets/silver.png" class="res-mini-icon"> 은</span>
-                    <span class="value" id="silver-val">100</span>
-                </div>
-                <!-- 무드 스탯 추가 -->
-                <div class="status-card mood-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'mood')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                    <span class="label"><img src="assets/mood.png" id="mood-icon" class="res-mini-icon"> 무드</span>
-                    <div class="mood-bar-container">
-                        <div id="mood-bar-fill" class="mood-bar-fill"></div>
-                    </div>
-                    <span class="mood-val-text" id="mood-val">60%</span>
-                </div>
-                <!-- 특수 처방 (약초/금융) -->
-                <div class="status-row">
-                    <div class="status-card herbal-card clickable" id="btn-use-herbal" onclick="window.app.useHerbs()" onmouseenter="window.app.ui.showResourceTooltip(event, 'herbalMedicine')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <span class="label"><img src="assets/약초.webp" class="res-mini-icon"> 약초</span>
-                        <span class="value" id="herbal-val">0</span>
-                    </div>
-                    <div class="status-card financial-card clickable" id="btn-use-financial" onclick="window.app.useFinancialTherapy()" onmouseenter="window.app.ui.showResourceTooltip(event, 'financialTherapy')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <span class="label"><img src="assets/silver.png" class="res-mini-icon"> 금융치료</span>
-                        <span class="value">300</span>
+            <!-- 서브 탭 1: 진행 상태 및 배속 -->
+            <div id="sub-tab-status-main" class="sub-tab-pane active">
+                <div class="speed-control-container">
+                    <div class="speed-controls">
+                        <button class="speed-btn active">x1 [1]</button>
+                        <button class="speed-btn">x2 [2]</button>
+                        <button class="speed-btn">x4 [3]</button>
+                        <button id="btn-pause" class="speed-btn">일시정지 [SPACE]</button>
                     </div>
                 </div>
-            </div>
 
-            <div class="status-section">
-                <h3 class="section-title">자원 현황</h3>
-                <div class="resource-list">
-                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'food')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <img src="assets/food.png" class="res-mini-icon"> <span>식량</span>
-                        <span id="res-food">0</span>
+                <div class="status-section">
+                    <h3 class="section-title">정착지 상태</h3>
+                    
+                    <div class="status-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'wave')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <span class="label">웨이브</span>
+                        <span class="value"><span id="wave-val">1</span> / 100</span>
                     </div>
-                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'researchPoints')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <img src="assets/research.png" class="res-mini-icon"> <span>연구</span>
-                        <span id="res-research">0</span>
+                    <div class="status-card">
+                        <span class="label">다음 웨이브</span>
+                        <span class="value" id="timer-val">01:59</span>
                     </div>
-                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'wood')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <img src="assets/wood.png" class="res-mini-icon"> <span>목재</span>
-                        <span id="res-wood">0</span>
+                    <div class="status-card highlight" onmouseenter="window.app.ui.showResourceTooltip(event, 'population')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <span class="label">인구</span>
+                        <span class="value" id="pop-val">3</span>
                     </div>
-                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'steel')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <img src="assets/steel.png" class="res-mini-icon"> <span>강철</span>
-                        <span id="res-steel">0</span>
+                    <div class="status-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'enemyCount')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <span class="label">적 수</span>
+                        <span class="value" id="enemy-val">0 / 100</span>
                     </div>
-                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'plasteel')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <img src="assets/plasteel.png" class="res-mini-icon"> <span>플라스틸</span>
-                        <span id="res-plasteel">0</span>
+                    <div class="status-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'silver')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <span class="label"><img src="assets/silver.png" class="res-mini-icon"> 은</span>
+                        <span class="value" id="silver-val">100</span>
                     </div>
-                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'uranium')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <img src="assets/uranium.png" class="res-mini-icon"> <span>우라늄</span>
-                        <span id="res-uranium">0</span>
-                    </div>
-                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'jade')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <img src="assets/jade.png" class="res-mini-icon"> <span>비취</span>
-                        <span id="res-jade">0</span>
-                    </div>
-                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'component')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <img src="assets/부품.webp" class="res-mini-icon"> <span>부품</span>
-                        <span id="res-component">0</span>
+                    <div class="status-card mood-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'mood')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <span class="label"><img src="assets/mood.png" id="mood-icon" class="res-mini-icon"> 무드</span>
+                        <div class="mood-bar-container">
+                            <div id="mood-bar-fill" class="mood-bar-fill"></div>
+                        </div>
+                        <span class="mood-val-text" id="mood-val">60%</span>
                     </div>
                 </div>
             </div>
 
-            <!-- [New] 특수 아이템 섹션 (자원 탭 하단) -->
-            <div class="status-section item-section">
-                <h3 class="section-title">특수 아이템</h3>
-                
-                <div class="item-card clickable" id="btn-item-orbital" onclick="window.app.useItem('orbital_strike')"
-                     onmouseenter="window.app.ui.showItemTooltip(event, 'orbital_strike')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
-                    <div class="item-info">
-                        <img src="assets/궤도빔조준기.webp" class="item-icon">
-                        <span class="label">궤도 폭격</span>
+            <!-- 서브 탭 2: 자원 현황 -->
+            <div id="sub-tab-status-resources" class="sub-tab-pane">
+                <div class="status-section">
+                    <h3 class="section-title">보유 자원</h3>
+                    <div class="resource-list">
+                        <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'food')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                            <img src="assets/food.png" class="res-mini-icon"> <span>식량</span>
+                            <span id="res-food">0</span>
+                        </div>
+                        <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'researchPoints')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                            <img src="assets/research.png" class="res-mini-icon"> <span>연구</span>
+                            <span id="res-research">0</span>
+                        </div>
+                        <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'wood')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                            <img src="assets/wood.png" class="res-mini-icon"> <span>목재</span>
+                            <span id="res-wood">0</span>
+                        </div>
+                        <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'steel')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                            <img src="assets/steel.png" class="res-mini-icon"> <span>강철</span>
+                            <span id="res-steel">0</span>
+                        </div>
+                        <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'plasteel')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                            <img src="assets/plasteel.png" class="res-mini-icon"> <span>플라스틸</span>
+                            <span id="res-plasteel">0</span>
+                        </div>
+                        <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'uranium')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                            <img src="assets/uranium.png" class="res-mini-icon"> <span>우라늄</span>
+                            <span id="res-uranium">0</span>
+                        </div>
+                        <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'jade')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                            <img src="assets/jade.png" class="res-mini-icon"> <span>비취</span>
+                            <span id="res-jade">0</span>
+                        </div>
+                        <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'component')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                            <img src="assets/부품.webp" class="res-mini-icon"> <span>부품</span>
+                            <span id="res-component">0</span>
+                        </div>
                     </div>
-                    <span class="item-count" id="count-orbital">0</span>
                 </div>
+            </div>
 
-                <div class="item-card clickable" id="btn-item-frag" onclick="window.app.useItem('frag_grenade')"
-                     onmouseenter="window.app.ui.showItemTooltip(event, 'frag_grenade')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
-                    <div class="item-info">
-                        <img src="assets/파쇄수류탄.webp" class="item-icon">
-                        <span class="label">파쇄 수류탄</span>
+            <!-- 서브 탭 3: 특수 아이템 -->
+            <div id="sub-tab-status-items" class="sub-tab-pane">
+                <div class="status-section">
+                    <h3 class="section-title">특수 처방 및 아이템</h3>
+                    <div class="status-row">
+                        <div class="status-card herbal-card clickable" id="btn-use-herbal" onclick="window.app.useHerbs()" onmouseenter="window.app.ui.showResourceTooltip(event, 'herbalMedicine')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                            <span class="label"><img src="assets/약초.webp" class="res-mini-icon"> 약초</span>
+                            <span class="value" id="herbal-val">0</span>
+                        </div>
+                        <div class="status-card financial-card clickable" id="btn-use-financial" onclick="window.app.useFinancialTherapy()" onmouseenter="window.app.ui.showResourceTooltip(event, 'financialTherapy')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                            <span class="label"><img src="assets/silver.png" class="res-mini-icon"> 금융치료</span>
+                            <span class="value">300</span>
+                        </div>
                     </div>
-                    <span class="item-count" id="count-frag">0</span>
-                </div>
 
-                <div class="item-card clickable" id="btn-item-pulse" onclick="window.app.useItem('pulse_grenade')"
-                     onmouseenter="window.app.ui.showItemTooltip(event, 'pulse_grenade')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
-                    <div class="item-info">
-                        <img src="assets/empgrenades.webp" class="item-icon">
-                        <span class="label">펄스 수류탄</span>
+                    <div class="button-list item-section">
+                        <div class="item-card clickable" id="btn-item-orbital" onclick="window.app.useItem('orbital_strike')"
+                             onmouseenter="window.app.ui.showItemTooltip(event, 'orbital_strike')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <div class="item-info">
+                                <img src="assets/궤도빔조준기.webp" class="item-icon">
+                                <span class="label">궤도 폭격</span>
+                            </div>
+                            <span class="item-count" id="count-orbital">0</span>
+                        </div>
+                        <div class="item-card clickable" id="btn-item-frag" onclick="window.app.useItem('frag_grenade')"
+                             onmouseenter="window.app.ui.showItemTooltip(event, 'frag_grenade')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <div class="item-info">
+                                <img src="assets/파쇄수류탄.webp" class="item-icon">
+                                <span class="label">파쇄 수류탄</span>
+                            </div>
+                            <span class="item-count" id="count-frag">0</span>
+                        </div>
+                        <div class="item-card clickable" id="btn-item-pulse" onclick="window.app.useItem('pulse_grenade')"
+                             onmouseenter="window.app.ui.showItemTooltip(event, 'pulse_grenade')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <div class="item-info">
+                                <img src="assets/empgrenades.webp" class="item-icon">
+                                <span class="label">펄스 수류탄</span>
+                            </div>
+                            <span class="item-count" id="count-pulse">0</span>
+                        </div>
+                        <div class="item-card clickable" id="btn-item-molotov" onclick="window.app.useItem('molotov')"
+                             onmouseenter="window.app.ui.showItemTooltip(event, 'molotov')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <div class="item-info">
+                                <img src="assets/화염병.webp" class="item-icon">
+                                <span class="label">화염병</span>
+                            </div>
+                            <span class="item-count" id="count-molotov">0</span>
+                        </div>
+                        <div class="item-card clickable" id="btn-item-smoke" onclick="window.app.useItem('smoke_launcher')"
+                             onmouseenter="window.app.ui.showItemTooltip(event, 'smoke_launcher')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <div class="item-info">
+                                <img src="assets/smokelauncher.webp" class="item-icon">
+                                <span class="label">연막 발사기</span>
+                            </div>
+                            <span class="item-count" id="count-smoke">0</span>
+                        </div>
+                        <div class="item-card clickable" id="btn-item-toxin" onclick="window.app.useItem('toxin_grenade')"
+                             onmouseenter="window.app.ui.showItemTooltip(event, 'toxin_grenade')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <div class="item-info">
+                                <img src="assets/toxingrenade.webp" class="item-icon">
+                                <span class="label">독소 수류탄</span>
+                            </div>
+                            <span class="item-count" id="count-toxin">0</span>
+                        </div>
                     </div>
-                    <span class="item-count" id="count-pulse">0</span>
-                </div>
-
-                <div class="item-card clickable" id="btn-item-molotov" onclick="window.app.useItem('molotov')"
-                     onmouseenter="window.app.ui.showItemTooltip(event, 'molotov')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
-                    <div class="item-info">
-                        <img src="assets/화염병.webp" class="item-icon">
-                        <span class="label">화염병</span>
-                    </div>
-                    <span class="item-count" id="count-molotov">0</span>
-                </div>
-
-                <div class="item-card clickable" id="btn-item-smoke" onclick="window.app.useItem('smoke_launcher')"
-                     onmouseenter="window.app.ui.showItemTooltip(event, 'smoke_launcher')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
-                    <div class="item-info">
-                        <img src="assets/smokelauncher.webp" class="item-icon">
-                        <span class="label">연막 발사기</span>
-                    </div>
-                    <span class="item-count" id="count-smoke">0</span>
-                </div>
-
-                <div class="item-card clickable" id="btn-item-toxin" onclick="window.app.useItem('toxin_grenade')"
-                     onmouseenter="window.app.ui.showItemTooltip(event, 'toxin_grenade')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
-                    <div class="item-info">
-                        <img src="assets/toxingrenade.webp" class="item-icon">
-                        <span class="label">독소 수류탄</span>
-                    </div>
-                    <span class="item-count" id="count-toxin">0</span>
-                </div>
-
-                <div class="item-card clickable" id="btn-item-psychic" onclick="window.app.useItem('psychic_lance')"
-                     onmouseenter="window.app.ui.showItemTooltip(event, 'psychic_lance')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
-                    <div class="item-info">
-                        <img src="assets/정신충격창.webp" class="item-icon">
-                        <span class="label">정신충격창</span>
-                    </div>
-                    <span class="item-count" id="count-psychic">0</span>
-                </div>
-
-                <div class="item-card clickable" id="btn-item-gojuice" onclick="window.app.useItem('go_juice')"
-                     onmouseenter="window.app.ui.showItemTooltip(event, 'go_juice')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
-                    <div class="item-info">
-                        <img src="assets/고주스.webp" class="item-icon">
-                        <span class="label">고주스</span>
-                    </div>
-                    <span class="item-count" id="count-gojuice">0</span>
                 </div>
             </div>
         </aside>
@@ -762,6 +754,15 @@
             </div>
         </div>
     </div>
+
+    <!-- [New] 모바일 전용 하단 내비게이션 바 -->
+    <nav id="mobile-nav" class="mobile-only">
+        <button onclick="window.app.ui.toggleMobilePanel('left-sidebar')">📊 상태</button>
+        <button onclick="window.app.ui.toggleMobilePanel('tab-shop')">💰 상점</button>
+        <button onclick="window.app.ui.toggleMobilePanel('tab-craft')">🔨 제작</button>
+        <button onclick="window.app.ui.toggleMobilePanel('tab-train')">🛡️ 훈련</button>
+        <button onclick="window.app.ui.toggleMobilePanel('settings-modal')">⚙️ 설정</button>
+    </nav>
 
     <script type="module" src="main.js"></script>
     <!-- [New] 독립형 리더보드 모달 (Leaderboard Only) -->

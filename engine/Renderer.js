@@ -27,8 +27,13 @@ export class Renderer {
   resize() {
     const parent = this.canvas.parentElement;
     if (parent) {
-      this.canvas.width = parent.clientWidth;
-      this.canvas.height = parent.clientHeight;
+      // [Fixed Resolution System] 
+      // 논리적인 게임 해상도는 800x800으로 고정하고, 
+      // 스타일(CSS)로 화면에 맞게 늘립니다.
+      this.canvas.width = 800;
+      this.canvas.height = 800;
+      
+      // 실제 표시되는 크기 업데이트
       this.width = this.canvas.width;
       this.height = this.canvas.height;
     }
@@ -64,7 +69,8 @@ export class Renderer {
     // 캔버스 중앙 계산
     const centerX = this.width / 2;
     const centerY = this.height / 2;
-    const radius = 320;
+    // [Mobile Fix] 반지름을 기존 320으로 복구하여 맵 크기 정상화
+    const radius = 320; 
 
     // 원형 트랙 그리기 (황무지 최적화 색상 레시피 수정 적용)
     this.ctx.beginPath();

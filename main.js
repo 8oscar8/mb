@@ -473,10 +473,10 @@ class App {
   init() {
     console.log("%c[RimWorld TD] Engine V2 Started", "color: #00f2ff; font-weight: bold;");
     
-    // 렌더러 크기에 맞춰 정밀한 경로 생성
-    const cx = this.renderer.width / 2;
-    const cy = this.renderer.height / 2;
-    this.waypoints = this.createCircularPath(cx, cy, 320, 120); // 세그먼트 수를 120으로 늘려 곡선 정교화
+    const cx = 400; // 기준점 고정
+    const cy = 400;
+    const dynamicRadius = 320;
+    this.waypoints = this.createCircularPath(cx, cy, dynamicRadius, 120); 
     
     // 웨이브 매니저 실제 초기화
     this.waveManager = new WaveManager(
