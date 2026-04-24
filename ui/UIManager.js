@@ -2540,6 +2540,9 @@ export class UIManager {
     const rightSidebar = document.getElementById('right-sidebar');
     const settingsModal = document.getElementById('settings-modal');
 
+    // [New] 탭 전환 시 유닛 상세 정보창 자동 숨김
+    this.hideUnitDetail();
+
     // 모든 패널 초기화 (숨김)
     const hideAll = () => {
         leftSidebar.classList.remove('active');
