@@ -1634,48 +1634,51 @@ input[type=range] {
 /* Mobile UI Rewrite: Integrated Bottom Tab System */
 @media (max-width: 1024px) {
     body {
-        overflow-x: hidden;
-        overflow-y: auto;
+        overflow-x: hidden !important;
+        overflow-y: auto !important;
     }
 
     #app-container {
-        display: flex;
-        flex-direction: column;
-        width: 100vw;
-        height: auto;
-        min-height: 100vh;
-        justify-content: flex-start; /* 상단부터 배치 */
+        display: flex !important;
+        flex-direction: column !important; /* 강제 세로 배치 */
+        width: 100vw !important;
+        height: auto !important;
+        min-height: 100vh !important;
+        justify-content: flex-start !important;
+        overflow-x: hidden !important;
     }
 
     /* 맵 (상단 고정) */
     #game-main {
-        width: 100vw;
-        height: 100vw;
-        position: relative;
-        top: 0;
-        z-index: 100;
-        background: #000;
-        order: -1; /* 무조건 최상단으로 배치 */
+        width: 100vw !important;
+        height: 100vw !important;
+        position: relative !important;
+        top: 0 !important;
+        z-index: 100 !important;
+        background: #000 !important;
+        order: -1 !important; /* 항상 최상단 */
     }
 
-    /* 하단 UI 컨텐츠 영역 (사이드바들이 이곳으로 통합됨) */
+    /* 하단 UI 컨텐츠 영역 (사이드바 통합) */
     .sidebar {
         position: relative !important;
         left: 0 !important;
         right: 0 !important;
-        width: 100% !important;
+        width: 100vw !important; /* 화면 가득 채움 */
         height: auto !important;
-        min-height: calc(100vh - 100vw - 60px);
-        background: var(--bg-panel);
-        display: none !important; /* 기본적으로 숨김 */
-        padding: 15px;
-        box-shadow: none;
-        border: none;
+        min-height: calc(100vh - 100vw - 60px) !important;
+        background: var(--bg-panel) !important;
+        display: none !important; /* 활성 탭 외 무조건 숨김 */
+        padding: 15px !important;
+        box-shadow: none !important;
+        border: none !important;
+        border-radius: 0 !important;
+        margin: 0 !important;
     }
 
     /* 활성화된 사이드바만 표시 */
     .sidebar.active {
-        display: block !important;
+        display: block !important; /* flex 대신 block으로 레이아웃 단순화 */
     }
 
     /* 가로형 자원 목록 배치 */
