@@ -1809,34 +1809,35 @@ input[type=range] {
     }
 
     /* 설정 모달을 하단 탭으로 통합 (최우선 순위 부여) */
+    /* 설정창 탭 시스템 통합 (모바일 전용) */
     #settings-modal {
-        position: relative !important;
-        display: none !important; /* 기본은 숨김 */
+        display: none !important;
+        order: 1 !important; /* 지도 다음 */
         width: 100vw !important;
-        height: auto !important;
-        background: var(--bg-panel) !important;
-        z-index: 2000 !important;
-        backdrop-filter: none !important;
-        border: none !important;
+        height: calc(100vh - 45vh - 50px) !important;
+        background: #0a0a0a !important;
         margin: 0 !important;
         padding: 0 !important;
+        position: relative !important;
+        z-index: 100 !important;
+        overflow-y: auto !important;
+        border: none !important;
     }
 
-    /* .active가 붙으면 무조건 표시 */
     #settings-modal.active {
         display: block !important;
-        visibility: visible !important;
-        opacity: 1 !important;
     }
 
-    /* 기존 hidden 클래스 무력화 (모바일 전용) */
-    #settings-modal.active.hidden {
-        display: block !important;
-    }
-
-    /* [전면 개편] 설정 모달 그리드 레이아웃 */
     #settings-modal .settings-content {
-        padding: 10px !important;
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 15px !important;
+        background: transparent !important;
+        box-shadow: none !important;
+        border-radius: 0 !important;
+        transform: none !important;
+        position: static !important;
     }
 
     .settings-title {

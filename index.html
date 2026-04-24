@@ -563,6 +563,64 @@
                 <div class="wait-count">대기 인원: <span id="idle-pop-val">1</span></div>
             </section>
         </aside>
+
+        <!-- [New] 설정 모달 (Settings) - 레이아웃 통합을 위해 컨테이너 내부로 이동 -->
+        <div id="settings-modal" class="hidden">
+            <div class="settings-content">
+                <h2 class="settings-title">설정 (Settings)</h2>
+                
+                <div class="settings-section">
+                    <h3 class="settings-subtitle">오디오 (Audio)</h3>
+                    <div class="setting-row">
+                        <label>마스터 볼륨</label>
+                        <input type="range" id="setting-master-vol" min="0" max="1" step="0.01" value="1">
+                        <span class="vol-val" id="val-master-vol">100%</span>
+                    </div>
+                    <div class="setting-row">
+                        <label>배경음악 (BGM)</label>
+                        <input type="range" id="setting-bgm-vol" min="0" max="1" step="0.01" value="0.5">
+                        <span class="vol-val" id="val-bgm-vol">50%</span>
+                    </div>
+                    <div class="setting-row">
+                        <label>무기 효과음</label>
+                        <input type="range" id="setting-weapon-vol" min="0" max="1" step="0.01" value="0.5">
+                        <span class="vol-val" id="val-weapon-vol">50%</span>
+                    </div>
+                    <div class="setting-row">
+                        <label>일반 효과음 (UI)</label>
+                        <input type="range" id="setting-ui-vol" min="0" max="1" step="0.01" value="0.5">
+                        <span class="vol-val" id="val-ui-vol">50%</span>
+                    </div>
+                    <div class="setting-row">
+                        <label>사망 효과음</label>
+                        <input type="range" id="setting-enemy-vol" min="0" max="1" step="0.01" value="0.5">
+                        <span class="vol-val" id="val-enemy-vol">50%</span>
+                    </div>
+                </div>
+
+                <div class="settings-section">
+                    <h3 class="settings-subtitle">알림 (Notifications)</h3>
+                    <div class="setting-row">
+                        <label>미니 알림 팝업 표시</label>
+                        <input type="checkbox" id="setting-show-notif" checked>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3 class="settings-subtitle">배경화면 변경</h3>
+                    <div class="setting-row-buttons">
+                        <button id="btn-bg-arid" class="bg-choice-btn active" data-bg="arid">1. 메마른 황무지</button>
+                        <button id="btn-bg-lush" class="bg-choice-btn" data-bg="lush">2. 울창한 관목지</button>
+                    </div>
+                </div>
+
+                <div class="settings-actions">
+                    <button id="settings-lb-btn" class="secondary-btn">🏆 리더보드 순위표</button>
+                    <button id="settings-giveup-btn" class="danger-btn">🏳️ 포기하기 (결과창)</button>
+                    <button id="settings-close-btn">닫기 (ESC)</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <!-- 전역 커스텀 툴팁 -->
@@ -661,63 +719,6 @@
         </div>
     </div>
 
-    <!-- [New] 설정 모달 (Settings) -->
-    <div id="settings-modal" class="hidden">
-        <div class="settings-content">
-            <h2 class="settings-title">설정 (Settings)</h2>
-            
-            <div class="settings-section">
-                <h3 class="settings-subtitle">오디오 (Audio)</h3>
-                <div class="setting-row">
-                    <label>마스터 볼륨</label>
-                    <input type="range" id="setting-master-vol" min="0" max="1" step="0.01" value="1">
-                    <span class="vol-val" id="val-master-vol">100%</span>
-                </div>
-                <div class="setting-row">
-                    <label>배경음악 (BGM)</label>
-                    <input type="range" id="setting-bgm-vol" min="0" max="1" step="0.01" value="0.5">
-                    <span class="vol-val" id="val-bgm-vol">50%</span>
-                </div>
-                <div class="setting-row">
-                    <label>무기 효과음</label>
-                    <input type="range" id="setting-weapon-vol" min="0" max="1" step="0.01" value="0.5">
-                    <span class="vol-val" id="val-weapon-vol">50%</span>
-                </div>
-                <div class="setting-row">
-                    <label>일반 효과음 (UI)</label>
-                    <input type="range" id="setting-ui-vol" min="0" max="1" step="0.01" value="0.5">
-                    <span class="vol-val" id="val-ui-vol">50%</span>
-                </div>
-                <div class="setting-row">
-                    <label>사망 효과음</label>
-                    <input type="range" id="setting-enemy-vol" min="0" max="1" step="0.01" value="0.5">
-                    <span class="vol-val" id="val-enemy-vol">50%</span>
-                </div>
-            </div>
-
-            <div class="settings-section">
-                <h3 class="settings-subtitle">알림 (Notifications)</h3>
-                <div class="setting-row">
-                    <label>미니 알림 팝업 표시</label>
-                    <input type="checkbox" id="setting-show-notif" checked>
-                </div>
-            </div>
-            
-            <div class="settings-section">
-                <h3 class="settings-subtitle">배경화면 변경</h3>
-                <div class="setting-row-buttons">
-                    <button id="btn-bg-arid" class="bg-choice-btn active" data-bg="arid">1. 메마른 황무지</button>
-                    <button id="btn-bg-lush" class="bg-choice-btn" data-bg="lush">2. 울창한 관목지</button>
-                </div>
-            </div>
-
-            <div class="settings-actions">
-                <button id="settings-lb-btn" class="secondary-btn">🏆 리더보드 순위표</button>
-                <button id="settings-giveup-btn" class="danger-btn">🏳️ 포기하기 (결과창)</button>
-                <button id="settings-close-btn">닫기 (ESC)</button>
-            </div>
-        </div>
-    </div>
 
     <!-- [New] 튜토리얼 무전창 (Tutorial Overlay) -->
     <div id="tutorial-overlay" class="hidden">
