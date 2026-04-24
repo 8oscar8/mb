@@ -1936,14 +1936,53 @@ input[type=range] {
         font-size: 11px !important;
     }
 
-    /* 유닛 상세창 높이 축소 */
-    #unit-detail-box {
-        padding: 8px !important;
-        bottom: 60px !important;
+    /* [전면 개편] 유닛/몬스터 정보 오버레이 (독립 레이어) */
+    .unit-info-overlay {
+        position: fixed !important;
+        bottom: 60px !important; /* 하단 바 위 */
+        left: 0 !important;
+        width: 100vw !important;
+        z-index: 2500 !important;
+        padding: 0 10px !important;
+        pointer-events: none !important; /* 클릭 방해 금지 */
+    }
+
+    .unit-info-overlay.hidden {
+        display: none !important;
+    }
+
+    .unit-info-overlay .info-box {
+        pointer-events: auto !important; /* 내부 버튼은 클릭 가능 */
+        width: 100% !important;
+        max-width: 500px !important;
+        margin: 0 auto !important;
+        background: rgba(15, 20, 25, 0.95) !important;
+        border: 1px solid var(--accent-gold) !important;
+        border-radius: 12px 12px 0 0 !important;
+        box-shadow: 0 -10px 40px rgba(0,0,0,0.8) !important;
+        padding: 12px !important;
     }
 
     .unit-stats-grid {
-        gap: 5px !important;
+        display: grid !important;
+        grid-template-columns: 1fr 2fr 2fr !important;
+        gap: 8px !important;
+        align-items: center !important;
+    }
+
+    .unit-name-col h4 {
+        font-size: 13px !important;
+        margin: 0 !important;
+    }
+
+    .stat-row {
+        font-size: 11px !important;
+        margin-bottom: 2px !important;
+    }
+
+    .stat-row.dps {
+        color: var(--accent-cyan) !important;
+        font-weight: bold !important;
     }
 }
 

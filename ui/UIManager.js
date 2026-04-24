@@ -101,6 +101,7 @@ export class UIManager {
     this.rowEffect = document.getElementById('row-effect');
     this.detailEffect = document.getElementById('detail-effect');
     this.unitDetailBox = document.getElementById('unit-detail-box');
+    this.unitDetailOverlay = document.getElementById('unit-detail-overlay'); // [New] 오버레이 참조
     this.tooltip = document.getElementById('custom-tooltip');
     this._isRefreshingTooltip = false; // 무한 루프 방지 플래그
 
@@ -676,6 +677,10 @@ export class UIManager {
   showUnitDetail(tower) {
     if (!tower || !tower.weaponData) return;
     this.selectedUnit = tower; // 현재 선택된 유닛 추적
+
+    // [New] 모바일 오버레이 표시
+    if (this.unitDetailOverlay) this.unitDetailOverlay.classList.remove('hidden');
+
     try {
       // 품질 이름 매핑
       const qualNames = { awful: '끔찍', normal: '평범', excellent: '완벽', legendary: '전설' };
@@ -913,6 +918,10 @@ export class UIManager {
   hideUnitDetail() {
     this.selectedUnit = null;
     this.selectedEnemy = null;
+    
+    // [New] 모바일 오버레이 숨김
+    if (this.unitDetailOverlay) this.unitDetailOverlay.classList.add('hidden');
+
     const detailArea = document.getElementById('unit-detail-area');
     if (detailArea) {
         if (this.combineUnitBtn) this.combineUnitBtn.classList.add('hidden');
@@ -926,6 +935,9 @@ export class UIManager {
     if (!enemy) return;
     this.selectedUnit = null;
     this.selectedEnemy = enemy;
+
+    // [New] 모바일 오버레이 표시
+    if (this.unitDetailOverlay) this.unitDetailOverlay.classList.remove('hidden');
 
     try {
       this.detailName.textContent = enemy.name || "침입자";
