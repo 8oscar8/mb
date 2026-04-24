@@ -1936,15 +1936,15 @@ input[type=range] {
         font-size: 11px !important;
     }
 
-    /* [전면 개편] 유닛/몬스터 정보 오버레이 (독립 레이어) */
+    /* 유닛 정보 오버레이 위치 조정 (슬림해진 하단바에 맞춰서) */
     .unit-info-overlay {
         position: fixed !important;
-        bottom: 60px !important; /* 하단 바 위 */
+        bottom: 50px !important; /* 60px -> 50px */
         left: 0 !important;
         width: 100vw !important;
         z-index: 2500 !important;
         padding: 0 10px !important;
-        pointer-events: none !important; /* 클릭 방해 금지 */
+        pointer-events: none !important;
     }
 
     .unit-info-overlay.hidden {
@@ -2001,6 +2001,46 @@ input[type=range] {
 
     .close-overlay-btn:hover {
         color: #fff;
+    }
+
+    /* 하단 네비게이션 바 슬림화 */
+    #mobile-nav {
+        display: flex !important;
+        position: fixed !important;
+        bottom: 0 !important;
+        left: 0 !important;
+        width: 100vw !important;
+        height: 50px !important; /* 60px -> 50px */
+        background: rgba(10, 15, 20, 0.98) !important;
+        z-index: 3000 !important;
+        border-top: 1px solid rgba(255,255,255,0.1) !important;
+        box-shadow: 0 -5px 20px rgba(0,0,0,0.5) !important;
+    }
+
+    #mobile-nav button {
+        flex: 1 !important;
+        background: none !important;
+        border: none !important;
+        color: #aaa !important;
+        font-size: 11px !important;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: center !important;
+        justify-content: center !important;
+        gap: 2px !important;
+    }
+
+    /* 배속 버튼 콤팩트화 */
+    .speed-btn {
+        height: 36px !important;
+        font-size: 12px !important;
+        padding: 0 8px !important;
+        border-radius: 6px !important;
+    }
+
+    .speed-controls {
+        gap: 5px !important;
+        margin-bottom: 8px !important;
     }
 }
 

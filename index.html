@@ -24,10 +24,10 @@
             <div id="sub-tab-status-main" class="sub-tab-pane active">
                 <div class="speed-control-container">
                     <div class="speed-controls">
-                        <button class="speed-btn active">x1 [1]</button>
-                        <button class="speed-btn">x2 [2]</button>
-                        <button class="speed-btn">x4 [3]</button>
-                        <button id="btn-pause" class="speed-btn">일시정지 [SPACE]</button>
+                        <button class="speed-btn active">x1</button>
+                        <button class="speed-btn">x2</button>
+                        <button class="speed-btn">x4</button>
+                        <button id="btn-pause" class="speed-btn">일시정지</button>
                     </div>
                 </div>
 
@@ -263,19 +263,17 @@
                 <!-- 상점 탭 -->
                 <div id="tab-shop" class="tab-pane active">
                     <div class="button-list">
-                        <button id="btn-buy-random" class="shop-btn"
-                            onmouseenter="window.app.ui.showGachaTooltip(event, 'random')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                        <button id="btn-buy-random" class="shop-btn">
                             <img src="assets/silver.png" class="res-mini-icon">
-                            <span class="text">무작위 유닛 구매 (50) [Q]</span>
+                            <span class="text">무작위 유닛 구매 (50)</span>
                         </button>
-                        <button id="btn-buy-advanced" class="shop-btn"
-                            onmouseenter="window.app.ui.showGachaTooltip(event, 'advanced')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                        <button id="btn-buy-advanced" class="shop-btn">
                             <img src="assets/silver.png" class="res-mini-icon">
-                            <span class="text">고급 무기 상자 (1,000) [W]</span>
+                            <span class="text">고급 무기 상자 (1,000)</span>
                         </button>
                         <button id="btn-exchange-jade" class="shop-btn" style="background: rgba(30, 100, 30, 0.3); border-left: 4px solid var(--accent-green);">
                             <img src="assets/jade.png" class="res-mini-icon">
-                            <span class="text">비취옥 환전 (1개 → 250 <img src="assets/silver.png" class="inline-icon">) [H]</span>
+                            <span class="text">비취옥 환전 (1개 → 250 <img src="assets/silver.png" class="inline-icon">)</span>
                         </button>
                         <button id="btn-sell-units" class="shop-btn sell">
                             <img src="assets/silver.png" class="res-mini-icon">
@@ -390,7 +388,7 @@
                         <!-- 기존 전투 업그레이드 -->
                         <button id="up-blunt" class="upgrade-btn" data-type="blunt">
                             <div class="up-info">
-                                <span class="up-name">둔기 [SHIFT+Q]</span>
+                                <span class="up-name">둔기</span>
                                 <span class="up-dpm">(Total.DPM: <span id="blunt-dpm">0</span>)</span>
                             </div>
                             <div class="up-effect">+10%</div>
@@ -400,7 +398,7 @@
                         </button>
                         <button id="up-melee" class="upgrade-btn" data-type="sharp">
                             <div class="up-info">
-                                <span class="up-name">날붙이 [SHIFT+W]</span>
+                                <span class="up-name">날붙이</span>
                                 <span class="up-dpm">(Total.DPM: <span id="sharp-dpm">0</span>)</span>
                             </div>
                             <div class="up-effect">+10%</div>
@@ -410,7 +408,7 @@
                         </button>
                         <button id="up-ranged" class="upgrade-btn" data-type="ranged">
                             <div class="up-info">
-                                <span class="up-name">원거리 [SHIFT+E]</span>
+                                <span class="up-name">원거리</span>
                                 <span class="up-dpm">(Total.DPM: <span id="ranged-dpm">0</span>)</span>
                             </div>
                             <div class="up-effect">+10%</div>
@@ -494,7 +492,7 @@
                     <!-- 벌목 -->
                     <div class="work-item-v2">
                         <div class="work-row-top">
-                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'logging')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/벌목.webp" class="work-icon"> 벌목 [Z]</span>
+                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'logging')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/벌목.webp" class="work-icon"> 벌목</span>
                             <span class="work-mul">x1.0</span>
                             <span class="work-percent">0%</span>
                             <div class="work-ctrl-v2">
@@ -508,7 +506,7 @@
                     <!-- 채광 -->
                     <div class="work-item-v2">
                         <div class="work-row-top">
-                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'mining')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/채광.webp" class="work-icon"> 채광 [X]</span>
+                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'mining')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/채광.webp" class="work-icon"> 채광</span>
                             <span class="work-mul">x1.0</span>
                             <span class="work-percent">0%</span>
                             <div class="work-ctrl-v2">
@@ -522,7 +520,7 @@
                     <!-- 농사 -->
                     <div class="work-item-v2">
                         <div class="work-row-top">
-                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'farming')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/농사.webp" class="work-icon"> 농사 [C]</span>
+                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'farming')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/농사.webp" class="work-icon"> 농사</span>
                             <span class="work-mul">x1.0</span>
                             <span class="work-percent">0%</span>
                             <div class="work-ctrl-v2">
@@ -536,7 +534,7 @@
                     <!-- 연구 -->
                     <div class="work-item-v2">
                         <div class="work-row-top">
-                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'research')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/research.png" class="work-icon"> 연구 [V]</span>
+                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'research')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/research.png" class="work-icon"> 연구</span>
                             <span class="work-mul">x1.0</span>
                             <span class="work-percent">0%</span>
                             <div class="work-ctrl-v2">
@@ -550,7 +548,7 @@
                     <!-- 교역 -->
                     <div class="work-item-v2">
                         <div class="work-row-top">
-                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'trading')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/교역.webp" class="work-icon"> 교역 [B]</span>
+                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'trading')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/교역.webp" class="work-icon"> 교역</span>
                             <span class="work-mul">x1.0</span>
                             <span class="work-percent">0%</span>
                             <div class="work-ctrl-v2">
