@@ -2533,8 +2533,8 @@ export class UIManager {
         leftSidebar.classList.remove('active');
         rightSidebar.classList.remove('active');
         settingsModal.classList.remove('active');
-        // 데스크톱 호환을 위해 hidden 클래스도 제어 (모바일은 active로 제어)
-        settingsModal.classList.add('hidden'); 
+        settingsModal.classList.add('hidden'); // 기존 로직 호환
+        settingsModal.style.display = 'none'; // 강제 숨김
     };
 
     // 1. 설정 모달 처리
@@ -2544,8 +2544,9 @@ export class UIManager {
         if (!isCurrentlyActive) {
             settingsModal.classList.add('active');
             settingsModal.classList.remove('hidden');
+            settingsModal.style.display = 'block'; // 강제 표시
         }
-        SoundManager.playClick();
+        if (SoundManager) SoundManager.playClick();
         return;
     }
 

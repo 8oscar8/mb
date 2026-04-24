@@ -2027,6 +2027,12 @@ class App {
    * [New] 설정 창 토글 로직
    */
   toggleSettings() {
+    // [New] 모바일 대응: 하단 탭 시스템이 있으면 그쪽 로직을 따름
+    if (window.innerWidth <= 1024 && this.ui && this.ui.toggleMobilePanel) {
+        this.ui.toggleMobilePanel('settings-modal');
+        return;
+    }
+
     const modal = document.getElementById('settings-modal');
     if (!modal) return;
 
