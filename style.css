@@ -1661,9 +1661,10 @@ input[type=range] {
         background: #000;
     }
 
-    /* 3. 사이드바 (지도 바로 다음 순서) */
-    .sidebar {
+    /* 3. 사이드바 및 모든 패널 (상태, 상점, 제작, 훈련, 설정 모두 통합) */
+    #left-sidebar, #right-sidebar, #settings-modal {
         display: none !important;
+        visibility: hidden;
         order: 1 !important; /* 지도(-1) 다음 */
         width: 100vw !important;
         height: calc(100vh - 45vh - 50px) !important;
@@ -1671,25 +1672,24 @@ input[type=range] {
         margin: 0 !important;
         padding: 10px !important;
         position: relative !important;
+        top: 0 !important;
+        left: 0 !important;
+        transform: none !important;
         overflow-y: auto !important;
+        box-sizing: border-box !important;
+        z-index: 100 !important;
+        border: none !important;
     }
 
-    .sidebar.active {
+    /* 활성화된 패널만 즉시 노출 */
+    #left-sidebar.active, #right-sidebar.active, #settings-modal.active {
         display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
     }
 
-    /* 설정창(Settings) */
-    #settings-modal {
-        display: none !important;
-        order: 1 !important;
-        width: 100vw !important;
-        height: calc(100vh - 45vh - 50px) !important;
-        margin: 0 !important;
-        background: #0a0a0a !important;
-        overflow-y: auto !important;
-    }
-
-    #settings-modal.active {
+    /* 기존 hidden 클래스 무력화 */
+    #left-sidebar.active.hidden, #settings-modal.active.hidden {
         display: block !important;
     }
 
@@ -2041,6 +2041,13 @@ input[type=range] {
         align-items: center !important;
         justify-content: center !important;
         gap: 2px !important;
+        transition: all 0.2s ease;
+    }
+
+    #mobile-nav button.active {
+        color: var(--accent-gold) !important;
+        background: rgba(245, 158, 11, 0.1) !important;
+        font-weight: bold;
     }
 
     /* 배속 버튼 콤팩트화 */

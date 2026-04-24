@@ -565,7 +565,7 @@
         </aside>
 
         <!-- [New] 설정 모달 (Settings) - 레이아웃 통합을 위해 컨테이너 내부로 이동 -->
-        <div id="settings-modal" class="hidden">
+        <div id="settings-modal">
             <div class="settings-content">
                 <h2 class="settings-title">설정 (Settings)</h2>
                 
@@ -758,11 +758,11 @@
 
     <!-- [New] 모바일 전용 하단 내비게이션 바 -->
     <nav id="mobile-nav" class="mobile-only">
-        <button onclick="window.app.ui.toggleMobilePanel('left-sidebar')">📊 상태</button>
-        <button onclick="window.app.ui.toggleMobilePanel('tab-shop')">💰 상점</button>
-        <button onclick="window.app.ui.toggleMobilePanel('tab-craft')">🔨 제작</button>
-        <button onclick="window.app.ui.toggleMobilePanel('tab-train')">🛡️ 훈련</button>
-        <button onclick="window.app.ui.toggleMobilePanel('settings-modal')">⚙️ 설정</button>
+        <button id="nav-left-sidebar" data-panel="left-sidebar" onclick="window.app.ui.toggleMobilePanel('left-sidebar')">📊 상태</button>
+        <button id="nav-tab-shop" data-panel="tab-shop" onclick="window.app.ui.toggleMobilePanel('tab-shop')">💰 상점</button>
+        <button id="nav-tab-craft" data-panel="tab-craft" onclick="window.app.ui.toggleMobilePanel('tab-craft')">🔨 제작</button>
+        <button id="nav-tab-train" data-panel="tab-train" onclick="window.app.ui.toggleMobilePanel('tab-train')">🛡️ 훈련</button>
+        <button id="nav-settings-modal" data-panel="settings-modal" onclick="window.app.ui.toggleMobilePanel('settings-modal')">⚙️ 설정</button>
     </nav>
 
     <script type="module" src="main.js"></script>

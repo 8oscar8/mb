@@ -2533,54 +2533,79 @@ export class UIManager {
   }
 
   /**
-   * [New] 모바일 전용 패널 토글 로직
+   * [New] 모바일 전용 패널 토글 로직 (최종 교정)
    */
   toggleMobilePanel(panelId) {
     const leftSidebar = document.getElementById('left-sidebar');
     const rightSidebar = document.getElementById('right-sidebar');
     const settingsModal = document.getElementById('settings-modal');
+    const mobileNav = document.getElementById('mobile-nav');
 
-    // [New] 탭 전환 시 유닛 상세 정보창 자동 숨김
     this.hideUnitDetail();
 
-    // 모든 패널 초기화 (숨김)
-    const hideAll = () => {
-        leftSidebar.classList.remove('active');
-        rightSidebar.classList.remove('active');
-        settingsModal.classList.remove('active');
+    // 1. 모든 패널 비활성화 (active 제거 및 필요 시 hidden 추가)
+    const hideAllPanels = () => {
+        if (leftSidebar) {
+            leftSidebar.classList.remove('active');
+        }
+        if (rightSidebar) {
+            rightSidebar.classList.remove('active');
+        }
+        if (settingsModal) {
+            settingsModal.classList.remove('active');
+            settingsModal.classList.add('hidden'); // 데스크톱 호환성을 위해 hidden 추가
+        }
     };
 
-    // 1. 설정 모달 처리
+    // 2. 모바일 내비게이션 버튼 상태 업데이트
+    const updateNavButtons = (activeId) => {
+        if (!mobileNav) return;
+        const buttons = mobileNav.querySelectorAll('button');
+        buttons.forEach(btn => {
+            const isTarget = btn.getAttribute('data-panel') === activeId;
+            btn.classList.toggle('active', isTarget);
+        });
+    };
+
+    // 3. 로직 분기
     if (panelId === 'settings-modal') {
-        const isCurrentlyActive = settingsModal.classList.contains('active');
-        hideAll();
-        if (!isCurrentlyActive) {
+        const isCurrentlyActive = settingsModal && settingsModal.classList.contains('active');
+        hideAllPanels();
+        
+        if (!isCurrentlyActive && settingsModal) {
             settingsModal.classList.add('active');
             settingsModal.classList.remove('hidden');
+            updateNavButtons('settings-modal');
         } else {
-            // 이미 활성화된 상태에서 다시 누르면 상태창으로 복귀
-            leftSidebar.classList.add('active');
+            // 이미 설정창이면 상태창으로 복귀
+            if (leftSidebar) leftSidebar.classList.add('active');
+            updateNavButtons('left-sidebar');
         }
-        if (SoundManager) SoundManager.playClick();
-        return;
+    } 
+    else if (panelId === 'left-sidebar') {
+        hideAllPanels();
+        if (leftSidebar) {
+            leftSidebar.classList.add('active');
+            leftSidebar.classList.remove('hidden'); // 강제 노출
+            this.switchSubTab('status-main');
+            updateNavButtons('left-sidebar');
+        }
     }
-
-    // 2. 탭 전환 연동 처리 (상점, 제작, 훈련 등)
-    if (panelId.startsWith('tab-')) {
+    else if (panelId.startsWith('tab-')) {
         const tabName = panelId.replace('tab-', '');
-        this.switchTab(tabName);
-        
-        hideAll();
-        rightSidebar.classList.add('active');
-    } else if (panelId === 'left-sidebar') {
-        // 왼쪽 사이드바 (상태창) 열기
-        hideAll();
-        leftSidebar.classList.add('active');
-        this.switchSubTab('status-main');
+        hideAllPanels();
+        if (rightSidebar) {
+            this.switchTab(tabName); // 내부 탭 전환 (버튼 색상 등 처리)
+            rightSidebar.classList.add('active');
+            rightSidebar.classList.remove('hidden');
+            updateNavButtons(panelId);
+        }
     }
 
-    // [Sound] 클릭 효과음
-    SoundManager.playClick();
+    if (typeof SoundManager !== 'undefined') {
+        if (SoundManager.playClick) SoundManager.playClick();
+        else if (SoundManager.playSFX) SoundManager.playSFX('assets/audio/Click.ogg');
+    }
   }
 
   /**
