@@ -1638,7 +1638,7 @@ input[type=range] {
         overflow-y: auto !important;
     }
 
-    /* 1. 전체 컨테이너: 스크롤을 막고 요소를 순서대로 정렬 */
+    /* 1. 전체 컨테이너 */
     #app-container {
         display: flex !important;
         flex-direction: column !important;
@@ -1647,40 +1647,41 @@ input[type=range] {
         overflow: hidden !important;
     }
 
-    /* 2. 지도 (최상단 고정) */
+    /* 2. 지도 (무조건 최상단 강제) */
     #game-main {
+        display: block !important;
         width: 100vw !important;
         height: 45vh !important;
         min-height: 45vh !important;
-        order: 1 !important; /* 첫 번째 */
+        order: -1 !important; /* 가장 먼저 출력 */
         margin: 0 !important;
         padding: 0 !important;
+        position: relative !important;
         z-index: 10 !important;
+        background: #000;
     }
 
-    /* 3. 사이드바 (지도 바로 아래 밀착) */
+    /* 3. 사이드바 (지도 바로 다음 순서) */
     .sidebar {
         display: none !important;
-        order: 2 !important; /* 두 번째 */
+        order: 1 !important; /* 지도(-1) 다음 */
         width: 100vw !important;
-        height: calc(100vh - 45vh - 50px) !important; /* 지도와 하단바 제외한 나머지 전체 */
+        height: calc(100vh - 45vh - 50px) !important;
         background: #0a0a0a !important;
         margin: 0 !important;
         padding: 10px !important;
         position: relative !important;
         overflow-y: auto !important;
-        box-sizing: border-box !important;
     }
 
-    /* 활성화된 사이드바만 즉시 노출 */
     .sidebar.active {
         display: block !important;
     }
 
-    /* 설정창(Settings)도 사이드바와 동일하게 처리 */
+    /* 설정창(Settings) */
     #settings-modal {
         display: none !important;
-        order: 2 !important;
+        order: 1 !important;
         width: 100vw !important;
         height: calc(100vh - 45vh - 50px) !important;
         margin: 0 !important;
