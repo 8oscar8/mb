@@ -1796,20 +1796,29 @@ input[type=range] {
         padding: 12px !important;
     }
 
-    /* 설정 모달을 하단 탭으로 통합 */
+    /* 설정 모달을 하단 탭으로 통합 (최우선 순위 부여) */
     #settings-modal {
         position: relative !important;
-        top: 0 !important;
-        left: 0 !important;
-        width: 100% !important;
+        display: none !important; /* 기본은 숨김 */
+        width: 100vw !important;
         height: auto !important;
         background: var(--bg-panel) !important;
-        display: none !important; /* 기본 숨김 */
         z-index: 2000 !important;
         backdrop-filter: none !important;
+        border: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
     }
 
+    /* .active가 붙으면 무조건 표시 */
     #settings-modal.active {
+        display: block !important;
+        visibility: visible !important;
+        opacity: 1 !important;
+    }
+
+    /* 기존 hidden 클래스 무력화 (모바일 전용) */
+    #settings-modal.active.hidden {
         display: block !important;
     }
 
@@ -1817,10 +1826,11 @@ input[type=range] {
         width: 100% !important;
         max-width: 100% !important;
         border: none !important;
-        padding: 15px !important;
+        padding: 20px !important;
         background: transparent !important;
         box-shadow: none !important;
         animation: none !important;
+        display: block !important;
     }
 
     #settings-modal .settings-actions {
