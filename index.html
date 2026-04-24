@@ -1,0 +1,784 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RimWorld TD: 메운디 에디션</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="tutorial.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700&family=Outfit:wght@300;600&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body class="dark-theme">
+    <div id="app-container">
+        <!-- 1. 왼쪽 사이드바: 정착지 상태 -->
+        <aside id="left-sidebar" class="sidebar glass-panel">
+            <div class="speed-control-container">
+                <div class="speed-controls">
+                    <button class="speed-btn active">x1 [1]</button>
+                    <button class="speed-btn">x2 [2]</button>
+                    <button class="speed-btn">x4 [3]</button>
+                    <button id="btn-pause" class="speed-btn">일시정지 [SPACE]</button>
+                </div>
+            </div>
+
+            <div class="status-section">
+                <h3 class="section-title">정착지 상태</h3>
+                
+                <div class="status-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'wave')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                    <span class="label">웨이브</span>
+                    <span class="value"><span id="wave-val">1</span> / 100</span>
+                </div>
+                <div class="status-card">
+                    <span class="label">다음 웨이브</span>
+                    <span class="value" id="timer-val">01:59</span>
+                </div>
+                <div class="status-card highlight" onmouseenter="window.app.ui.showResourceTooltip(event, 'population')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                    <span class="label">인구</span>
+                    <span class="value" id="pop-val">3</span>
+                </div>
+                <div class="status-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'enemyCount')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                    <span class="label">적 수</span>
+                    <span class="value" id="enemy-val">0 / 100</span>
+                </div>
+                <div class="status-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'silver')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                    <span class="label"><img src="assets/silver.png" class="res-mini-icon"> 은</span>
+                    <span class="value" id="silver-val">100</span>
+                </div>
+                <!-- 무드 스탯 추가 -->
+                <div class="status-card mood-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'mood')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                    <span class="label"><img src="assets/mood.png" id="mood-icon" class="res-mini-icon"> 무드</span>
+                    <div class="mood-bar-container">
+                        <div id="mood-bar-fill" class="mood-bar-fill"></div>
+                    </div>
+                    <span class="mood-val-text" id="mood-val">60%</span>
+                </div>
+                <!-- 특수 처방 (약초/금융) -->
+                <div class="status-row">
+                    <div class="status-card herbal-card clickable" id="btn-use-herbal" onclick="window.app.useHerbs()" onmouseenter="window.app.ui.showResourceTooltip(event, 'herbalMedicine')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <span class="label"><img src="assets/약초.webp" class="res-mini-icon"> 약초</span>
+                        <span class="value" id="herbal-val">0</span>
+                    </div>
+                    <div class="status-card financial-card clickable" id="btn-use-financial" onclick="window.app.useFinancialTherapy()" onmouseenter="window.app.ui.showResourceTooltip(event, 'financialTherapy')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <span class="label"><img src="assets/silver.png" class="res-mini-icon"> 금융치료</span>
+                        <span class="value">300</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="status-section">
+                <h3 class="section-title">자원 현황</h3>
+                <div class="resource-list">
+                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'food')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <img src="assets/food.png" class="res-mini-icon"> <span>식량</span>
+                        <span id="res-food">0</span>
+                    </div>
+                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'researchPoints')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <img src="assets/research.png" class="res-mini-icon"> <span>연구</span>
+                        <span id="res-research">0</span>
+                    </div>
+                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'wood')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <img src="assets/wood.png" class="res-mini-icon"> <span>목재</span>
+                        <span id="res-wood">0</span>
+                    </div>
+                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'steel')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <img src="assets/steel.png" class="res-mini-icon"> <span>강철</span>
+                        <span id="res-steel">0</span>
+                    </div>
+                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'plasteel')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <img src="assets/plasteel.png" class="res-mini-icon"> <span>플라스틸</span>
+                        <span id="res-plasteel">0</span>
+                    </div>
+                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'uranium')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <img src="assets/uranium.png" class="res-mini-icon"> <span>우라늄</span>
+                        <span id="res-uranium">0</span>
+                    </div>
+                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'jade')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <img src="assets/jade.png" class="res-mini-icon"> <span>비취</span>
+                        <span id="res-jade">0</span>
+                    </div>
+                    <div class="res-row" onmouseenter="window.app.ui.showResourceTooltip(event, 'component')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <img src="assets/부품.webp" class="res-mini-icon"> <span>부품</span>
+                        <span id="res-component">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- [New] 특수 아이템 섹션 (자원 탭 하단) -->
+            <div class="status-section item-section">
+                <h3 class="section-title">특수 아이템</h3>
+                
+                <div class="item-card clickable" id="btn-item-orbital" onclick="window.app.useItem('orbital_strike')"
+                     onmouseenter="window.app.ui.showItemTooltip(event, 'orbital_strike')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                    <div class="item-info">
+                        <img src="assets/궤도빔조준기.webp" class="item-icon">
+                        <span class="label">궤도 폭격</span>
+                    </div>
+                    <span class="item-count" id="count-orbital">0</span>
+                </div>
+
+                <div class="item-card clickable" id="btn-item-frag" onclick="window.app.useItem('frag_grenade')"
+                     onmouseenter="window.app.ui.showItemTooltip(event, 'frag_grenade')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                    <div class="item-info">
+                        <img src="assets/파쇄수류탄.webp" class="item-icon">
+                        <span class="label">파쇄 수류탄</span>
+                    </div>
+                    <span class="item-count" id="count-frag">0</span>
+                </div>
+
+                <div class="item-card clickable" id="btn-item-pulse" onclick="window.app.useItem('pulse_grenade')"
+                     onmouseenter="window.app.ui.showItemTooltip(event, 'pulse_grenade')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                    <div class="item-info">
+                        <img src="assets/empgrenades.webp" class="item-icon">
+                        <span class="label">펄스 수류탄</span>
+                    </div>
+                    <span class="item-count" id="count-pulse">0</span>
+                </div>
+
+                <div class="item-card clickable" id="btn-item-molotov" onclick="window.app.useItem('molotov')"
+                     onmouseenter="window.app.ui.showItemTooltip(event, 'molotov')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                    <div class="item-info">
+                        <img src="assets/화염병.webp" class="item-icon">
+                        <span class="label">화염병</span>
+                    </div>
+                    <span class="item-count" id="count-molotov">0</span>
+                </div>
+
+                <div class="item-card clickable" id="btn-item-smoke" onclick="window.app.useItem('smoke_launcher')"
+                     onmouseenter="window.app.ui.showItemTooltip(event, 'smoke_launcher')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                    <div class="item-info">
+                        <img src="assets/smokelauncher.webp" class="item-icon">
+                        <span class="label">연막 발사기</span>
+                    </div>
+                    <span class="item-count" id="count-smoke">0</span>
+                </div>
+
+                <div class="item-card clickable" id="btn-item-toxin" onclick="window.app.useItem('toxin_grenade')"
+                     onmouseenter="window.app.ui.showItemTooltip(event, 'toxin_grenade')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                    <div class="item-info">
+                        <img src="assets/toxingrenade.webp" class="item-icon">
+                        <span class="label">독소 수류탄</span>
+                    </div>
+                    <span class="item-count" id="count-toxin">0</span>
+                </div>
+
+                <div class="item-card clickable" id="btn-item-psychic" onclick="window.app.useItem('psychic_lance')"
+                     onmouseenter="window.app.ui.showItemTooltip(event, 'psychic_lance')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                    <div class="item-info">
+                        <img src="assets/정신충격창.webp" class="item-icon">
+                        <span class="label">정신충격창</span>
+                    </div>
+                    <span class="item-count" id="count-psychic">0</span>
+                </div>
+
+                <div class="item-card clickable" id="btn-item-gojuice" onclick="window.app.useItem('go_juice')"
+                     onmouseenter="window.app.ui.showItemTooltip(event, 'go_juice')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                    <div class="item-info">
+                        <img src="assets/고주스.webp" class="item-icon">
+                        <span class="label">고주스</span>
+                    </div>
+                    <span class="item-count" id="count-gojuice">0</span>
+                </div>
+            </div>
+        </aside>
+
+        <!-- 2. 중앙 메인: 게임 화면 -->
+        <main id="game-main">
+            <div class="canvas-container">
+                <!-- [New] 중앙 대형 카운트다운 오버레이 -->
+                <div id="wave-countdown-overlay" class="wave-countdown-hidden">
+                    <div class="countdown-content">
+                        <span id="countdown-next-info"></span>
+                        <span id="countdown-label">다음 웨이브까지</span>
+                        <span id="countdown-number">10</span>
+                    </div>
+                </div>
+                <!-- [New] 활성 이벤트 표시기 (맵 좌측 하단으로 이동) -->
+                <div id="active-events-container" class="map-event-container"></div>
+                <canvas id="game-canvas"></canvas>
+            </div>
+            <!-- 알림 배너 (가차 결과) -->
+            <div id="notification-banner" class="hidden">
+                <div class="notif-content">
+                    <h4 id="notif-title">연구 결과</h4>
+                    <p id="notif-text">작업 완료: 연구 +26, 부품 +2</p>
+                </div>
+            </div>
+
+            <!-- 미니 알림 (파견/자원 등, 5시 방향) -->
+            <div id="mini-notif-container"></div>
+
+            <!-- [New] 인카운터 모달 (림월드 스타일 팝업) -->
+            <div id="encounter-modal" class="hidden">
+                <div class="modal-content">
+                    <h2 id="event-modal-title">사건 발생</h2>
+                    <p id="event-modal-text">사건의 상세 설명이 여기에 표시됩니다.</p>
+                    <button id="event-modal-close-btn">확인</button>
+                    <!-- [New] 선택형 버튼 컨테이너 -->
+                    <div id="event-modal-choice-btns" class="hidden">
+                        <button id="event-modal-accept-btn" class="modal-choice-btn accept">희생을 감수 (수락)</button>
+                        <button id="event-modal-reject-btn" class="modal-choice-btn reject">안전을 도모 (거절)</button>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- 3. 오른쪽 사이드바: 작업 관리 및 정보 -->
+        <aside id="right-sidebar" class="sidebar glass-panel">
+            <!-- 유닛 정보 섹션 -->
+            <section class="unit-info-section">
+                <h3 class="section-title">유닛 정보 및 제작</h3>
+                <div id="unit-detail-box" class="info-box dark-box">
+                    <div class="unit-stats-grid">
+                        <div class="unit-name-col">
+                            <span id="detail-grade"></span>
+                            <h4 id="detail-name"></h4>
+                        </div>
+                        <div class="unit-detail-col">
+                            <div class="stat-row">병종: <span id="detail-type"></span> (Lv.<span id="detail-up-lv"></span>)</div>
+                            <div class="stat-row dps"><span id="lbl-dps">DPS</span>: <span id="detail-dps"></span></div>
+                            <div class="stat-row" id="row-atk"><span id="lbl-atk">공격력</span>: <span id="detail-atk"></span> <span id="detail-atk-bonus" class="bonus"></span></div>
+                            <div id="row-base-atk" style="font-size: 10px; color: #888; margin-top: -2px; margin-bottom: 4px; padding-left: 2px;">(기본: <span id="detail-base-atk"></span>)</div>
+                            <button id="btn-combine-unit" class="combine-btn hidden">
+                                <img src="assets/research.png" class="res-mini-icon">
+                                <span id="btn-combine-text">조합 실행 (200)</span>
+                            </button>
+                        </div>
+                        <div class="unit-meta-col">
+                            <div class="stat-row" id="row-ap"><span id="lbl-ap">방관</span>: <span id="detail-ap"></span></div>
+                            <div class="stat-row" id="row-range"><span id="lbl-range">사거리</span>: <span id="detail-range"></span></div>
+                            <div class="stat-row" id="row-spd"><span id="lbl-spd">공속</span>: <span id="detail-spd"></span> <span id="detail-spd-bonus" class="bonus"></span></div>
+                            <div id="row-base-spd" style="font-size: 10px; color: #888; margin-top: -2px; margin-bottom: 4px; padding-left: 2px;">(기본: <span id="detail-base-spd"></span>)</div>
+                            <div class="stat-row hidden" id="row-shred">방깎: <span id="detail-shred"></span></div>
+                            <div class="stat-row hidden" id="row-effect">특수: <span id="detail-effect"></span></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 탭 메뉴 -->
+            <nav class="action-tabs">
+                <button class="tab-btn active" data-tab="shop">상점</button>
+                <button class="tab-btn" data-tab="craft">제작</button>
+                <button class="tab-btn" data-tab="special">특수</button>
+                <button class="tab-btn" data-tab="train">훈련</button>
+            </nav>
+            
+            <!-- 탭 콘텐츠 영역 -->
+            <div id="tab-container">
+                <!-- 상점 탭 -->
+                <div id="tab-shop" class="tab-pane active">
+                    <div class="button-list">
+                        <button id="btn-buy-random" class="shop-btn"
+                            onmouseenter="window.app.ui.showGachaTooltip(event, 'random')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <img src="assets/silver.png" class="res-mini-icon">
+                            <span class="text">무작위 유닛 구매 (50) [Q]</span>
+                        </button>
+                        <button id="btn-buy-advanced" class="shop-btn"
+                            onmouseenter="window.app.ui.showGachaTooltip(event, 'advanced')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <img src="assets/silver.png" class="res-mini-icon">
+                            <span class="text">고급 무기 상자 (1,000) [W]</span>
+                        </button>
+                        <button id="btn-exchange-jade" class="shop-btn" style="background: rgba(30, 100, 30, 0.3); border-left: 4px solid var(--accent-green);">
+                            <img src="assets/jade.png" class="res-mini-icon">
+                            <span class="text">비취옥 환전 (1개 → 250 <img src="assets/silver.png" class="inline-icon">) [H]</span>
+                        </button>
+                        <button id="btn-sell-units" class="shop-btn sell">
+                            <img src="assets/silver.png" class="res-mini-icon">
+                            <span class="text">선택 유닛 판매 (5)</span>
+                        </button>
+                    </div>
+
+                    <!-- 자원 도박 섹션 -->
+                    <div class="gamble-group">
+                        <div class="gamble-title">─ 자원 암거래 및 정제 ─</div>
+                        <div class="button-list">
+                            <button class="shop-btn gamble-btn wood" onclick="window.app.gamble('wood')"
+                                onmouseenter="window.app.ui.showGambleTooltip(event, 'wood')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                                <img src="assets/wood.png" class="res-mini-icon">
+                                <span class="text">목재 정제 (200)</span>
+                            </button>
+                            <button class="shop-btn gamble-btn steel" onclick="window.app.gamble('steel')"
+                                onmouseenter="window.app.ui.showGambleTooltip(event, 'steel')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                                <img src="assets/steel.png" class="res-mini-icon">
+                                <span class="text">강철 분해 (200)</span>
+                            </button>
+                            <button class="shop-btn gamble-btn silver" onclick="window.app.gamble('silver')"
+                                onmouseenter="window.app.ui.showGambleTooltip(event, 'silver')" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                                <img src="assets/silver.png" class="res-mini-icon">
+                                <span class="text">암시장 거래 (300)</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <p class="shop-desc">유닛 구매, 환전 및 자원 암거래를 행합니다.</p>
+                </div>
+
+                <!-- 제작 탭 -->
+                <div id="tab-craft" class="tab-pane">
+                    <!-- 기술 수준 표시 및 업그레이드 -->
+                    <div class="tech-level-box glass-panel">
+                        <div class="tech-info">
+                            <span class="label">기술 수준:</span>
+                            <span id="tech-level-val" class="value">원시 (Primitive)</span>
+                        </div>
+                        <button id="btn-tech-upgrade" class="tech-up-btn"
+                            onmouseenter="window.app.ui.showTechTooltip(event)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            기술 업그레이드 (<img src="assets/silver.png" class="inline-icon"> <span id="tech-cost-silver">200</span>, <img src="assets/research.png" class="inline-icon"> <span id="tech-cost-research">100</span>)
+                        </button>
+                    </div>
+
+                    <div class="button-list craft-list">
+                        <button class="shop-btn craft rare" data-grade="Rare"
+                            onmouseenter="window.app.ui.showCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">Rare 제작 (<img src="assets/wood.png" class="inline-icon"> 30, <img src="assets/steel.png" class="inline-icon"> 30, <img src="assets/research.png" class="inline-icon"> 50, <img src="assets/부품.webp" class="inline-icon"> 1)</span>
+                        </button>
+                        <button class="shop-btn craft epic" data-grade="Epic"
+                            onmouseenter="window.app.ui.showCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">Epic 제작 (<img src="assets/steel.png" class="inline-icon"> 50, <img src="assets/plasteel.png" class="inline-icon"> 10, <img src="assets/research.png" class="inline-icon"> 100, <img src="assets/부품.webp" class="inline-icon"> 5)</span>
+                        </button>
+                        <button class="shop-btn craft mythic-btn" data-grade="Legendary"
+                            onmouseenter="window.app.ui.showCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">Mythic 제작 (<img src="assets/plasteel.png" class="inline-icon"> 30, <img src="assets/uranium.png" class="inline-icon"> 20, <img src="assets/research.png" class="inline-icon"> 300, <img src="assets/부품.webp" class="inline-icon"> 10)</span>
+                        </button>
+                        <button class="shop-btn craft legendary-btn" data-grade="Mythic"
+                            onmouseenter="window.app.ui.showCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">Legendary 제작 (<img src="assets/plasteel.png" class="inline-icon"> 50, <img src="assets/uranium.png" class="inline-icon"> 30, <img src="assets/research.png" class="inline-icon"> 500, <img src="assets/부품.webp" class="inline-icon"> 20)</span>
+                        </button>
+                        <button class="shop-btn special-craft" data-weapon="인공자아핵"
+                            style="margin-top: 10px; border: 1px solid var(--accent-gold); background: rgba(255,215,0,0.1); height: auto; padding: 10px;"
+                            onmouseenter="window.app.ui.showSpecialCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <div style="display: flex; align-items: center; justify-content: center; gap: 10px;">
+                                <img src="assets/인공자아핵.webp" style="width: 32px; height: 32px; border-radius: 4px; box-shadow: 0 0 10px var(--accent-gold);">
+                                <span class="text" style="color: var(--accent-gold); font-weight: 800; font-size: 1rem;">인공자아핵 (최종 병기 제작)</span>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 특수 탭 -->
+                <div id="tab-special" class="tab-pane">
+                    <div class="button-list">
+                        <button class="shop-btn special-craft" data-weapon="파쇄 수류탄"
+                            onmouseenter="window.app.ui.showSpecialCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">파쇄 수류탄 (300 <img src="assets/silver.png" class="inline-icon">, 150 <img src="assets/steel.png" class="inline-icon">, 5 <img src="assets/부품.webp" class="inline-icon">)</span>
+                        </button>
+                        <button class="shop-btn special-craft" data-weapon="펄스 수류탄"
+                            onmouseenter="window.app.ui.showSpecialCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">펄스 수류탄 (500 <img src="assets/silver.png" class="inline-icon">, 250 <img src="assets/steel.png" class="inline-icon">, 20 <img src="assets/plasteel.png" class="inline-icon">, 10 <img src="assets/부품.webp" class="inline-icon">)</span>
+                        </button>
+                        <button class="shop-btn special-craft" data-weapon="화염병"
+                            onmouseenter="window.app.ui.showSpecialCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">화염병 (350 <img src="assets/silver.png" class="inline-icon">, 100 <img src="assets/wood.png" class="inline-icon">, 5 <img src="assets/부품.webp" class="inline-icon">)</span>
+                        </button>
+                        <button class="shop-btn special-craft" data-weapon="연막 발사기"
+                            onmouseenter="window.app.ui.showSpecialCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">연막 발사기 (400 <img src="assets/silver.png" class="inline-icon">, 180 <img src="assets/steel.png" class="inline-icon">, 5 <img src="assets/부품.webp" class="inline-icon">)</span>
+                        </button>
+                        <button class="shop-btn special-craft" data-weapon="독소 수류탄"
+                            onmouseenter="window.app.ui.showSpecialCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">독소 수류탄 (1000 <img src="assets/silver.png" class="inline-icon">, 400 <img src="assets/steel.png" class="inline-icon">, 5 <img src="assets/jade.png" class="inline-icon">, 15 <img src="assets/부품.webp" class="inline-icon">)</span>
+                        </button>
+                        <button class="shop-btn special-craft" data-weapon="정신충격창"
+                            onmouseenter="window.app.ui.showSpecialCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">정신충격창 (1500 <img src="assets/silver.png" class="inline-icon">, 100 <img src="assets/uranium.png" class="inline-icon">, 50 <img src="assets/plasteel.png" class="inline-icon">, 10 <img src="assets/jade.png" class="inline-icon">, 20 <img src="assets/부품.webp" class="inline-icon">)</span>
+                        </button>
+                        <button class="shop-btn special-craft" data-weapon="고주스"
+                            onmouseenter="window.app.ui.showSpecialCraftTooltip(event, this)" onmousemove="window.app.ui.moveTooltip(event)" onmouseleave="window.app.ui.hideTooltip()">
+                            <span class="text">고주스 (500 <img src="assets/food.png" class="inline-icon">, 50 <img src="assets/약초.webp" class="inline-icon">, 20 <img src="assets/uranium.png" class="inline-icon">, 10 <img src="assets/부품.webp" class="inline-icon">)</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- 훈련 탭 -->
+                <div id="tab-train" class="tab-pane">
+                    <div class="upgrade-list">
+                        <!-- 기존 전투 업그레이드 -->
+                        <button id="up-blunt" class="upgrade-btn" data-type="blunt">
+                            <div class="up-info">
+                                <span class="up-name">둔기 [SHIFT+Q]</span>
+                                <span class="up-dpm">(Total.DPM: <span id="blunt-dpm">0</span>)</span>
+                            </div>
+                            <div class="up-effect">+10%</div>
+                            <div class="up-cost">
+                                (<img src="assets/silver.png" class="inline-icon"> <span id="blunt-cost-1">1</span> | <img src="assets/steel.png" class="inline-icon"> <span id="blunt-cost-2">1</span>)
+                            </div>
+                        </button>
+                        <button id="up-melee" class="upgrade-btn" data-type="sharp">
+                            <div class="up-info">
+                                <span class="up-name">날붙이 [SHIFT+W]</span>
+                                <span class="up-dpm">(Total.DPM: <span id="sharp-dpm">0</span>)</span>
+                            </div>
+                            <div class="up-effect">+10%</div>
+                            <div class="up-cost">
+                                (<img src="assets/wood.png" class="inline-icon"> <span id="sharp-cost-1">1</span> | <img src="assets/silver.png" class="inline-icon"> <span id="sharp-cost-2">1</span>)
+                            </div>
+                        </button>
+                        <button id="up-ranged" class="upgrade-btn" data-type="ranged">
+                            <div class="up-info">
+                                <span class="up-name">원거리 [SHIFT+E]</span>
+                                <span class="up-dpm">(Total.DPM: <span id="ranged-dpm">0</span>)</span>
+                            </div>
+                            <div class="up-effect">+10%</div>
+                            <div class="up-cost">
+                                (<img src="assets/plasteel.png" class="inline-icon"> <span id="ranged-cost-1">1</span> | <img src="assets/silver.png" class="inline-icon"> <span id="ranged-cost-2">1</span>)
+                            </div>
+                        </button>
+
+                        <div class="divider">파견 및 생산 강화</div>
+
+                        <!-- 생산 업그레이드 (스크린샷 기반) -->
+                        <button class="upgrade-btn prod-up" data-type="education">
+                            <div class="up-info">
+                                <span class="up-name">현대 교육</span>
+                                <span class="up-lv">(Lv.<span id="education-lv">0</span>/5)</span>
+                                <span class="up-desc">연구 효율 및 부품 획득 확률 증가</span>
+                            </div>
+                            <div class="up-cost" id="education-cost-area">
+                                (<img src="assets/silver.png" class="inline-icon"> <span id="education-cost-silver">200</span> | <img src="assets/wood.png" class="inline-icon"> <span id="education-cost-wood">100</span>)
+                            </div>
+                        </button>
+                        <button class="upgrade-btn prod-up" data-type="artisan">
+                            <div class="up-info">
+                                <span class="up-name">숙련 장인</span>
+                                <span class="up-lv">(Lv.<span id="artisan-lv">0</span>/5)</span>
+                                <span class="up-desc">제작 품질 증가</span>
+                            </div>
+                            <div class="up-cost" id="artisan-cost-area">
+                                (<img src="assets/silver.png" class="inline-icon"> <span id="artisan-cost-silver">200</span> | <img src="assets/steel.png" class="inline-icon"> <span id="artisan-cost-steel">100</span>)
+                            </div>
+                        </button>
+                        <button class="upgrade-btn prod-up" data-type="farming">
+                            <div class="up-info">
+                                <span class="up-name">선진 농법</span>
+                                <span class="up-lv">(Lv.<span id="farming-lv">0</span>/5)</span>
+                                <span class="up-desc">식량 생산 증가</span>
+                            </div>
+                            <div class="up-cost" id="farming-cost-area">
+                                (<img src="assets/silver.png" class="inline-icon"> <span id="farming-cost-silver">200</span> | <img src="assets/food.png" class="inline-icon"> <span id="farming-cost-food">100</span>)
+                            </div>
+                        </button>
+                        <button class="upgrade-btn prod-up" data-type="mining">
+                            <div class="up-info">
+                                <span class="up-name">심층 채굴</span>
+                                <span class="up-lv">(Lv.<span id="mining-lv">0</span>/5)</span>
+                                <span class="up-desc">고급 자원 확률 증가</span>
+                            </div>
+                            <div class="up-cost" id="mining-cost-area">
+                                (<img src="assets/silver.png" class="inline-icon"> <span id="mining-cost-silver">200</span> | <img src="assets/steel.png" class="inline-icon"> <span id="mining-cost-steel">100</span>)
+                            </div>
+                        </button>
+                        <button class="upgrade-btn prod-up" data-type="logging">
+                            <div class="up-info">
+                                <span class="up-name">기계 벌목</span>
+                                <span class="up-lv">(Lv.<span id="logging-lv">0</span>/5)</span>
+                                <span class="up-desc">목재 생산 증가</span>
+                            </div>
+                            <div class="up-cost" id="logging-cost-area">
+                                (<img src="assets/silver.png" class="inline-icon"> <span id="logging-cost-silver">200</span> | <img src="assets/wood.png" class="inline-icon"> <span id="logging-cost-wood">100</span>)
+                            </div>
+                        </button>
+                        <button class="upgrade-btn prod-up" data-type="trade">
+                            <div class="up-info">
+                                <span class="up-name">무역 네트워크</span>
+                                <span class="up-lv">(Lv.<span id="trade-lv">0</span>/5)</span>
+                                <span class="up-desc">은 수급 증가</span>
+                            </div>
+                            <div class="up-cost" id="trade-cost-area">
+                                (<img src="assets/silver.png" class="inline-icon"> <span id="trade-cost-silver">300</span> | <img src="assets/research.png" class="inline-icon"> <span id="trade-cost-researchPoints">150</span>)
+                            </div>
+                        </button>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- 작업 관리 -->
+            <section class="work-management glass-panel">
+                <h3 class="section-title">정착민 파견 관리 <span id="idle-alert" class="idle-alert hidden">대기 정착민 있음!</span></h3>
+                <div class="work-list">
+                    <!-- 벌목 -->
+                    <div class="work-item-v2">
+                        <div class="work-row-top">
+                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'logging')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/벌목.webp" class="work-icon"> 벌목 [Z]</span>
+                            <span class="work-mul">x1.0</span>
+                            <span class="work-percent">0%</span>
+                            <div class="work-ctrl-v2">
+                                <button class="btn-circle minus" data-type="logging">-</button>
+                                <span class="count" id="work-logging">0</span>
+                                <button class="btn-circle plus" data-type="logging">+</button>
+                            </div>
+                        </div>
+                        <div class="work-progress-bar"><div class="fill" id="bar-logging"></div></div>
+                    </div>
+                    <!-- 채광 -->
+                    <div class="work-item-v2">
+                        <div class="work-row-top">
+                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'mining')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/채광.webp" class="work-icon"> 채광 [X]</span>
+                            <span class="work-mul">x1.0</span>
+                            <span class="work-percent">0%</span>
+                            <div class="work-ctrl-v2">
+                                <button class="btn-circle minus" data-type="mining">-</button>
+                                <span class="count" id="work-mining">0</span>
+                                <button class="btn-circle plus" data-type="mining">+</button>
+                            </div>
+                        </div>
+                        <div class="work-progress-bar"><div class="fill" id="bar-mining"></div></div>
+                    </div>
+                    <!-- 농사 -->
+                    <div class="work-item-v2">
+                        <div class="work-row-top">
+                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'farming')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/농사.webp" class="work-icon"> 농사 [C]</span>
+                            <span class="work-mul">x1.0</span>
+                            <span class="work-percent">0%</span>
+                            <div class="work-ctrl-v2">
+                                <button class="btn-circle minus" data-type="farming">-</button>
+                                <span class="count" id="work-farming">0</span>
+                                <button class="btn-circle plus" data-type="farming">+</button>
+                            </div>
+                        </div>
+                        <div class="work-progress-bar"><div class="fill" id="bar-farming"></div></div>
+                    </div>
+                    <!-- 연구 -->
+                    <div class="work-item-v2">
+                        <div class="work-row-top">
+                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'research')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/research.png" class="work-icon"> 연구 [V]</span>
+                            <span class="work-mul">x1.0</span>
+                            <span class="work-percent">0%</span>
+                            <div class="work-ctrl-v2">
+                                <button class="btn-circle minus" data-type="research">-</button>
+                                <span class="count" id="work-research">0</span>
+                                <button class="btn-circle plus" data-type="research">+</button>
+                            </div>
+                        </div>
+                        <div class="work-progress-bar"><div class="fill" id="bar-research"></div></div>
+                    </div>
+                    <!-- 교역 -->
+                    <div class="work-item-v2">
+                        <div class="work-row-top">
+                            <span class="work-name" onmouseenter="window.app.ui.showWorkTooltip(event, 'trading')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)"><img src="assets/교역.webp" class="work-icon"> 교역 [B]</span>
+                            <span class="work-mul">x1.0</span>
+                            <span class="work-percent">0%</span>
+                            <div class="work-ctrl-v2">
+                                <button class="btn-circle minus" data-type="trading">-</button>
+                                <span class="count" id="work-trading">0</span>
+                                <button class="btn-circle plus" data-type="trading">+</button>
+                            </div>
+                        </div>
+                        <div class="work-progress-bar"><div class="fill" id="bar-trading"></div></div>
+                    </div>
+                </div>
+                <div class="wait-count">대기 인원: <span id="idle-pop-val">1</span></div>
+            </section>
+        </aside>
+    </div>
+
+    <!-- 전역 커스텀 툴팁 -->
+    <div id="custom-tooltip" class="custom-tooltip hidden"></div>
+
+    <!-- [New] 게임 결과 모달 (Game Over Report) -->
+    <div id="result-modal" class="hidden">
+        <div class="result-content">
+            <div class="result-header">
+                <h2 id="result-title">정착지 함락</h2>
+                <div id="result-message" style="color: #888; margin-bottom: 20px;">모든 정착민이 기지를 떠났습니다...</div>
+            </div>
+            
+            <div class="result-columns">
+                <!-- 왼쪽: 정착지 기록 요약 -->
+                <div class="res-col col-left">
+                    <div class="result-stats-grid">
+                        <div class="stat-item">
+                            <span class="label">최종 웨이브</span>
+                            <span id="res-wave" class="value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">생존 시간</span>
+                            <span id="res-time" class="value">00:00</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">처치한 적</span>
+                            <span id="res-kills" class="value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">누적 총 피해량</span>
+                            <span id="res-total-damage" class="value">0</span>
+                        </div>
+                        <div class="stat-item highlight">
+                            <span class="label">정착지 위력 점수</span>
+                            <span id="res-total-score" class="value">0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">최고 데미지 (유닛)</span>
+                            <span id="res-max-dmg" class="value">0 (없음)</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">최대 인구</span>
+                            <span id="res-max-pop" class="value">3명</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">총 연구 완료</span>
+                            <span id="res-total-research" class="value">0건</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">생산 보너스</span>
+                            <span id="res-prod-bonus" class="value">+0%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">평균 무드</span>
+                            <span id="res-avg-mood" class="value">0%</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="label">총 건설 횟수</span>
+                            <span id="res-towers-built" class="value">0회</span>
+                        </div>
+                    </div>
+
+                    <div class="result-resource-summary">
+                        <h4>사용한 총 자원</h4>
+                        <div id="res-resource-list"></div>
+                    </div>
+
+                    <div class="result-tower-summary">
+                        <h4>최종 방어선 구성</h4>
+                        <div id="res-tower-list"></div>
+                    </div>
+                </div>
+
+                <div class="res-col col-right">
+                    <div id="res-leaderboard-section" class="result-section">
+                        <h4>전 세계 정착지 랭킹 (Top 100)</h4>
+                        <div id="leaderboard-list">
+                            <div class="loading-msg">데이터 불러오는 중...</div>
+                        </div>
+                    </div>
+
+                    <div id="res-nickname-section" class="result-section">
+                        <h4>내 기록 등재</h4>
+                        <div class="nickname-controls">
+                            <input type="text" id="res-nickname-input" placeholder="정착지 이름 입력" maxlength="10">
+                            <button id="res-submit-btn">기록 등록</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="result-actions">
+                <button id="result-restart-btn">새로운 정착지 건설</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- [New] 설정 모달 (Settings) -->
+    <div id="settings-modal" class="hidden">
+        <div class="settings-content">
+            <h2 class="settings-title">설정 (Settings)</h2>
+            
+            <div class="settings-section">
+                <h3 class="settings-subtitle">오디오 (Audio)</h3>
+                <div class="setting-row">
+                    <label>마스터 볼륨</label>
+                    <input type="range" id="setting-master-vol" min="0" max="1" step="0.01" value="1">
+                    <span class="vol-val" id="val-master-vol">100%</span>
+                </div>
+                <div class="setting-row">
+                    <label>배경음악 (BGM)</label>
+                    <input type="range" id="setting-bgm-vol" min="0" max="1" step="0.01" value="0.5">
+                    <span class="vol-val" id="val-bgm-vol">50%</span>
+                </div>
+                <div class="setting-row">
+                    <label>무기 효과음</label>
+                    <input type="range" id="setting-weapon-vol" min="0" max="1" step="0.01" value="0.5">
+                    <span class="vol-val" id="val-weapon-vol">50%</span>
+                </div>
+                <div class="setting-row">
+                    <label>일반 효과음 (UI)</label>
+                    <input type="range" id="setting-ui-vol" min="0" max="1" step="0.01" value="0.5">
+                    <span class="vol-val" id="val-ui-vol">50%</span>
+                </div>
+                <div class="setting-row">
+                    <label>사망 효과음</label>
+                    <input type="range" id="setting-enemy-vol" min="0" max="1" step="0.01" value="0.5">
+                    <span class="vol-val" id="val-enemy-vol">50%</span>
+                </div>
+            </div>
+
+            <div class="settings-section">
+                <h3 class="settings-subtitle">알림 (Notifications)</h3>
+                <div class="setting-row">
+                    <label>미니 알림 팝업 표시</label>
+                    <input type="checkbox" id="setting-show-notif" checked>
+                </div>
+            </div>
+            
+            <div class="settings-section">
+                <h3 class="settings-subtitle">배경화면 변경</h3>
+                <div class="setting-row-buttons">
+                    <button id="btn-bg-arid" class="bg-choice-btn active" data-bg="arid">1. 메마른 황무지</button>
+                    <button id="btn-bg-lush" class="bg-choice-btn" data-bg="lush">2. 울창한 관목지</button>
+                </div>
+            </div>
+
+            <div class="settings-actions">
+                <button id="settings-lb-btn" class="secondary-btn">🏆 리더보드 순위표</button>
+                <button id="settings-giveup-btn" class="danger-btn">🏳️ 포기하기 (결과창)</button>
+                <button id="settings-close-btn">닫기 (ESC)</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- [New] 튜토리얼 무전창 (Tutorial Overlay) -->
+    <div id="tutorial-overlay" class="hidden">
+        <div class="tutorial-box">
+            <div class="tutorial-header">
+                <span class="terminal-icon">📡</span> [무전] 교신 중...
+            </div>
+            <div class="tutorial-body">
+                <div id="tutorial-msg">정착지에 오신 것을 환영합니다!</div>
+                <div id="tutorial-mission" class="hidden">
+                    <span class="mission-tag">임무:</span> <span id="mission-text">-</span>
+                </div>
+            </div>
+            <div class="tutorial-footer">
+                <button id="tutorial-next-btn">다음 (Next)</button>
+                <button id="tutorial-skip-btn">튜토리얼 건너뛰기</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- [New] 튜토리얼 지시 화살표 (Tutorial Pointer) -->
+    <div id="tutorial-pointer" class="hidden">
+        <div class="pointer-arrow">▼</div>
+    </div>
+
+    <!-- [New] 커스텀 확인 모달 (Custom Confirm Modal) -->
+    <div id="confirm-modal" class="hidden">
+        <div class="modal-content">
+            <h2 id="confirm-title">확인</h2>
+            <p id="confirm-message" style="margin-bottom: 30px;">정말로 진행하시겠습니까?</p>
+            <div class="confirm-btns" style="display: flex; gap: 15px; justify-content: center;">
+                <button id="confirm-yes-btn" class="modal-choice-btn accept">예</button>
+                <button id="confirm-no-btn" class="modal-choice-btn reject">아니오</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module" src="main.js"></script>
+    <!-- [New] 독립형 리더보드 모달 (Leaderboard Only) -->
+    <div id="leaderboard-modal" class="hidden">
+        <div class="lb-modal-content">
+            <div class="lb-header">
+                <h2>전 세계 정착지 랭킹 (Top 100)</h2>
+            </div>
+            <div class="lb-body">
+                <div id="lb-list-main" class="result-section">
+                    <div class="loading-msg">데이터 불러오는 중...</div>
+                </div>
+            </div>
+            <div class="lb-footer">
+                <button id="lb-modal-close-btn">돌아가기</button>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
