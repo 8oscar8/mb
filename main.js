@@ -74,6 +74,11 @@ class App {
         e.preventDefault();
         this.handleCanvasRightClick(e);
     });
+
+    // [New] 모바일 터치 이벤트 추가
+    this.renderer.canvas.addEventListener('touchstart', (e) => this.handleTouch(e), { passive: false });
+    this.renderer.canvas.addEventListener('touchmove', (e) => this.handleTouch(e), { passive: false });
+
     
     // [New] 키보드 입력 이벤트 핸들러 등록
     window.addEventListener('keydown', (e) => this.handleKeyDown(e));
@@ -291,19 +296,47 @@ class App {
     }
   }
 
-  handleMouseMove(e) {
+  /**
+   * [New] 마우스/터치 위치 업데이트 공통 로직
+   */
+  updateInputPos(clientX, clientY) {
     const rect = this.renderer.canvas.getBoundingClientRect();
-    this.mousePos.x = (e.clientX - rect.left) * (this.renderer.canvas.width / rect.width);
-    this.mousePos.y = (e.clientY - rect.top) * (this.renderer.canvas.height / rect.height);
+    const scaleX = this.renderer.canvas.width / rect.width;
+    const scaleY = this.renderer.canvas.height / rect.height;
+    
+    this.mousePos.x = (clientX - rect.left) * scaleX;
+    this.mousePos.y = (clientY - rect.top) * scaleY;
+
+    // 배치 모드나 아이템 타겟팅일 때 호버 상태 등 처리 가능 (필요 시)
+  }
+
+  handleMouseMove(e) {
+    this.updateInputPos(e.clientX, e.clientY);
+  }
+
+  /**
+   * [New] 터치 이벤트 처리
+   */
+  handleTouch(e) {
+    if (e.touches.length > 0) {
+        const touch = e.touches[0];
+        this.updateInputPos(touch.clientX, touch.clientY);
+        
+        // 배치 모드나 아이템 타겟팅 시 화면 스크롤 방지
+        if (this.placementMode || this.isItemTargeting) {
+            e.preventDefault();
+        }
+    }
   }
 
   handleCanvasClick(e) {
+
     if (this.inputLock) return;
 
-    // 마우스 위치 재계산 (이벤트 객체 기준)
-    const rect = this.renderer.canvas.getBoundingClientRect();
-    const clickX = (e.clientX - rect.left) * (this.renderer.canvas.width / rect.width);
-    const clickY = (e.clientY - rect.top) * (this.renderer.canvas.height / rect.height);
+    // 입력 위치 업데이트
+    this.updateInputPos(e.clientX, e.clientY);
+    const clickX = this.mousePos.x;
+    const clickY = this.mousePos.y;
     
     // 아이템 타겟팅 모드 처리
     if (this.isItemTargeting && this.pendingItemId) {
