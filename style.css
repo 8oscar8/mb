@@ -2143,40 +2143,40 @@ input[type=range] {
         align-items: flex-start !important;
     }
 
-    /* [New] 모바일 상단 실시간 상태 바 스타일 */
+    /* [New] 모바일 상단 실시간 상태 바 스타일 - 가시성 개선 (11시 방향) */
     #mobile-top-stats {
         position: absolute;
-        top: 10px;
-        left: 50%;
-        transform: translateX(-50%);
+        top: 8px;
+        left: 8px;
+        transform: none;
         display: flex;
         align-items: center;
-        gap: 12px;
-        background: rgba(0, 0, 0, 0.7);
-        backdrop-filter: blur(8px);
-        padding: 6px 16px;
-        border-radius: 30px;
-        border: 1px solid rgba(255, 255, 255, 0.15);
+        gap: 10px;
+        background: rgba(0, 0, 0, 0.4); /* 투명도 상향 */
+        backdrop-filter: blur(4px);    /* 블러 약화 */
+        padding: 4px 12px;
+        border-radius: 6px;           /* 더 각진 림월드 스타일 */
+        border: 1px solid rgba(255, 255, 255, 0.08);
         z-index: 1000;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-        pointer-events: none; /* 클릭 방해 금지 */
+        box-shadow: 2px 2px 10px rgba(0, 0, 0, 0.3);
+        pointer-events: none;
     }
 
     .top-stat-item {
         display: flex;
         align-items: center;
-        gap: 6px;
+        gap: 5px;
     }
 
     .top-label {
-        font-size: 10px;
-        color: var(--text-muted);
+        font-size: 9px; /* 크기 축소 */
+        color: rgba(255, 255, 255, 0.5);
         text-transform: uppercase;
         font-weight: 800;
     }
 
     .top-value {
-        font-size: 13px;
+        font-size: 11px; /* 크기 축소 */
         font-weight: 700;
         color: #fff;
         font-family: 'Outfit', sans-serif;
@@ -2184,8 +2184,8 @@ input[type=range] {
 
     .top-stat-divider {
         width: 1px;
-        height: 12px;
-        background: rgba(255, 255, 255, 0.2);
+        height: 10px;
+        background: rgba(255, 255, 255, 0.1);
     }
 }
 
