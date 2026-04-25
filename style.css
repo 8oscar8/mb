@@ -1894,6 +1894,45 @@ input[type=range] {
         align-self: flex-end;
     }
 
+    /* 무드 카드 특수 처리 (전체 너비 사용 및 내부 레이아웃 개선) */
+    .mood-card.full-width {
+        grid-column: span 2;
+        display: flex !important;
+        flex-direction: column !important;
+        align-items: stretch !important;
+        gap: 12px !important;
+        padding: 16px !important;
+        height: auto !important;
+    }
+
+    .mood-card .mood-bar-container {
+        width: 100% !important;
+        height: 14px !important;
+        background: rgba(0, 0, 0, 0.4) !important;
+        border: 1px solid rgba(255, 255, 255, 0.1) !important;
+        margin: 4px 0 !important;
+    }
+
+    .mood-val-text {
+        align-self: flex-end;
+        font-weight: 800;
+        color: var(--accent-gold);
+    }
+
+    /* 특수 처방 (약초/금융) 가로 배치 및 클릭 가시성 */
+    .status-row {
+        grid-column: span 2;
+        display: grid !important;
+        grid-template-columns: 1fr 1fr !important;
+        gap: 10px !important;
+        margin-top: 10px !important;
+    }
+
+    .status-card.clickable:active {
+        transform: scale(0.95);
+        background: rgba(255, 255, 255, 0.1) !important;
+    }
+
     /* 배경 선택 및 액션 버튼 그리드화 */
     .setting-row-buttons, .settings-actions {
         display: grid !important;
@@ -1929,19 +1968,6 @@ input[type=range] {
 
     .status-card .label { font-size: 10px !important; }
     .status-card .value { font-size: 14px !important; }
-
-    /* 무드 카드 특수 처리 (전체 너비 사용) */
-    .mood-card {
-        grid-column: span 2;
-    }
-
-    /* 특수 처방 (약초/금융) 가로 배치 */
-    .status-row {
-        grid-column: span 2;
-        display: grid !important;
-        grid-template-columns: 1fr 1fr !important;
-        gap: 8px !important;
-    }
 
     /* 자원 목록 3열 그리드 강화 */
     .resource-list {

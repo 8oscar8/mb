@@ -17,6 +17,7 @@
             <div class="sub-tab-menu mobile-only">
                 <button class="sub-tab-btn active" data-sub="status-main" onclick="window.app.ui.switchSubTab('status-main')">진행</button>
                 <button class="sub-tab-btn" data-sub="status-resources" onclick="window.app.ui.switchSubTab('status-resources')">자원</button>
+                <button class="sub-tab-btn" data-sub="status-mood" onclick="window.app.ui.switchSubTab('status-mood')">무드</button>
                 <button class="sub-tab-btn" data-sub="status-items" onclick="window.app.ui.switchSubTab('status-items')">아이템</button>
             </div>
 
@@ -53,13 +54,6 @@
                     <div class="status-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'silver')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
                         <span class="label"><img src="assets/silver.png" class="res-mini-icon"> 은</span>
                         <span class="value" id="silver-val">100</span>
-                    </div>
-                    <div class="status-card mood-card" onmouseenter="window.app.ui.showResourceTooltip(event, 'mood')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
-                        <span class="label"><img src="assets/mood.png" id="mood-icon" class="res-mini-icon"> 무드</span>
-                        <div class="mood-bar-container">
-                            <div id="mood-bar-fill" class="mood-bar-fill"></div>
-                        </div>
-                        <span class="mood-val-text" id="mood-val">60%</span>
                     </div>
                 </div>
             </div>
@@ -105,10 +99,19 @@
                 </div>
             </div>
 
-            <!-- 서브 탭 3: 특수 아이템 -->
-            <div id="sub-tab-status-items" class="sub-tab-pane">
+            <!-- 서브 탭 3: 무드 관리 -->
+            <div id="sub-tab-status-mood" class="sub-tab-pane">
                 <div class="status-section">
-                    <h3 class="section-title">특수 처방 및 아이템</h3>
+                    <h3 class="section-title">정착민 무드 및 처방</h3>
+                    
+                    <div class="status-card mood-card full-width" onmouseenter="window.app.ui.showResourceTooltip(event, 'mood')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
+                        <span class="label"><img src="assets/mood.png" id="mood-icon" class="res-mini-icon"> 무드 수치</span>
+                        <div class="mood-bar-container">
+                            <div id="mood-bar-fill" class="mood-bar-fill"></div>
+                        </div>
+                        <span class="mood-val-text" id="mood-val">60%</span>
+                    </div>
+
                     <div class="status-row">
                         <div class="status-card herbal-card clickable" id="btn-use-herbal" onclick="window.app.useHerbs()" onmouseenter="window.app.ui.showResourceTooltip(event, 'herbalMedicine')" onmouseleave="window.app.ui.hideTooltip()" onmousemove="window.app.ui.moveTooltip(event)">
                             <span class="label"><img src="assets/약초.webp" class="res-mini-icon"> 약초</span>
@@ -119,6 +122,13 @@
                             <span class="value">300</span>
                         </div>
                     </div>
+                </div>
+            </div>
+
+            <!-- 서브 탭 4: 전투 아이템 -->
+            <div id="sub-tab-status-items" class="sub-tab-pane">
+                <div class="status-section">
+                    <h3 class="section-title">전투 지원 아이템</h3>
 
                     <div class="button-list item-section">
                         <div class="item-card clickable" id="btn-item-orbital" onclick="window.app.useItem('orbital_strike')"
