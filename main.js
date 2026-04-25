@@ -322,9 +322,10 @@ class App {
         const touch = e.touches[0];
         this.updateInputPos(touch.clientX, touch.clientY);
         
-        // 배치 모드나 아이템 타겟팅 시 화면 스크롤 방지
-        if (this.placementMode || this.isItemTargeting) {
-            e.preventDefault();
+        // 배치 모드나 아이템 타겟팅 시 '이동(touchmove)' 중에만 화면 스크롤 방지
+        // touchstart에서 preventDefault를 하면 클릭(탭) 이벤트가 발생하지 않을 수 있음
+        if (e.type === 'touchmove' && (this.placementMode || this.isItemTargeting)) {
+            if (e.cancelable) e.preventDefault();
         }
     }
   }
@@ -333,8 +334,11 @@ class App {
 
     if (this.inputLock) return;
 
-    // 입력 위치 업데이트
-    this.updateInputPos(e.clientX, e.clientY);
+    // 입력 위치 업데이트 (clientX가 있는 경우에만)
+    if (e.clientX !== undefined) {
+        this.updateInputPos(e.clientX, e.clientY);
+    }
+    
     const clickX = this.mousePos.x;
     const clickY = this.mousePos.y;
     
