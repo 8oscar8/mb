@@ -214,6 +214,27 @@
                         <span class="top-label">적</span>
                         <span id="top-enemy-val" class="top-value">0/100</span>
                     </div>
+                    <div class="top-stat-divider"></div>
+                    <div class="top-stat-item">
+                        <span class="top-label"><img src="assets/silver.png" class="res-mini-icon"></span>
+                        <span id="top-silver-val" class="top-value">0</span>
+                    </div>
+                </div>
+
+                <!-- [New] 모바일 퀵 액션 UI (7시 무드, 5시 구매) -->
+                <div id="mobile-quick-mood" class="mobile-only" onclick="window.app.ui.toggleMobilePanel('left-sidebar'); window.app.ui.switchSubTab('status-mood')">
+                    <div class="quick-mood-container">
+                        <div id="quick-mood-fill" class="mood-bar-fill"></div>
+                    </div>
+                    <span id="quick-mood-val">60%</span>
+                </div>
+
+                <div id="mobile-quick-buy" class="mobile-only" onclick="window.app.buyRandomUnit()">
+                    <div class="quick-buy-inner">
+                        <img src="assets/silver.png" class="res-mini-icon">
+                        <span class="buy-label">고용</span>
+                        <span class="buy-price">50</span>
+                    </div>
                 </div>
 
                 <canvas id="game-canvas"></canvas>

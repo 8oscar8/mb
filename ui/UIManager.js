@@ -30,6 +30,10 @@ export class UIManager {
     this.topWaveVal = document.getElementById('top-wave-val');
     this.topTimerVal = document.getElementById('top-timer-val');
     this.topEnemyVal = document.getElementById('top-enemy-val');
+    this.topSilverVal = document.getElementById('top-silver-val');
+
+    this.quickMoodFill = document.getElementById('quick-mood-fill');
+    this.quickMoodValText = document.getElementById('quick-mood-val');
 
     // 2. 자원 정보
     this.resWood = document.getElementById('res-wood');
@@ -1122,12 +1126,18 @@ export class UIManager {
     }
     if (this.popVal) this.popVal.textContent = `${state.population} / ${state.maxPopulation}`;
     if (this.silverVal) this.silverVal.textContent = this.formatNumber(state.silver);
+    if (this.topSilverVal) this.topSilverVal.textContent = this.formatNumber(state.silver);
     
     // [New] 무드 UI 업데이트
     if (this.moodVal && this.moodBarFill) {
         const mood = state.mood || 0;
-        this.moodVal.textContent = `${Math.floor(mood)}%`;
+        const moodText = `${Math.floor(mood)}%`;
+        this.moodVal.textContent = moodText;
         this.moodBarFill.style.width = `${mood}%`;
+
+        // 퀵 무드 UI 동기화
+        if (this.quickMoodFill) this.quickMoodFill.style.width = `${mood}%`;
+        if (this.quickMoodValText) this.quickMoodValText.textContent = moodText;
 
         // 무드 상태별 색상 클래스 적용
         this.moodBarFill.className = 'mood-bar-fill'; // 초기화
