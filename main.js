@@ -13,6 +13,8 @@ import { HiddenEventManager } from './game/HiddenEventManager.js';
 import { bgmManager } from './engine/BGMManager.js';
 import { ITEM_DB } from './game/WeaponData.js';
 import { TutorialManager } from './core/TutorialManager.js';
+import { Projectile } from './game/Projectile.js';
+import { SpatialHash } from './game/SpatialHash.js';
 
 // [New] Supabase 초기화
 const SUPABASE_URL = "https://ibgnfoiolxgprsevcfhw.supabase.co";
@@ -45,6 +47,9 @@ class App {
     this.units = [];
     this.projectiles = [];
     this.fieldEffects = [];
+    
+    // [New] 성능 최적화를 위한 공간 분할 해시
+    this.enemyHash = new SpatialHash(800, 800, 80);
     
     // 4. 배치 모드 및 자원 관련 상태
     this.placementMode = false;
@@ -857,26 +862,41 @@ class App {
 
     // 1. 웨이브 엔진 업데이트
     this.waveManager.update(scaledDt, this.enemies);
-    this.state.nextWaveTimer = this.waveManager.nextWaveTimer; // 타이머 동기화
+    this.state.nextWaveTimer = this.waveManager.nextWaveTimer;
 
     // 2. 적 리스트 정리 및 업데이트
     this.enemies = this.enemies.filter(e => e.active);
-    this.enemies.forEach(e => e.update(scaledDt));
+    
+    // [New] 공간 분할 데이터 갱신
+    this.enemyHash.clear();
+    this.enemies.forEach(e => {
+        e.update(scaledDt);
+        this.enemyHash.insert(e);
+    });
 
-    // 3. 유닛 업데이트
-    this.units.forEach(u => u.update(scaledDt, this.enemies, (p) => this.projectiles.push(p)));
+    // 3. 유닛 업데이트 (SpatialHash 전달)
+    this.units.forEach(u => u.update(scaledDt, this.enemies, (p) => this.projectiles.push(p), { emi: false }, this.enemyHash));
 
-    // 4. 투사체 업데이트
-    this.projectiles = this.projectiles.filter(p => p.active);
-    this.projectiles.forEach(p => p.update(scaledDt, this.enemies, this.fieldEffects));
+    // 4. 투사체 업데이트 및 풀링 회수
+    this.projectiles = this.projectiles.filter(p => {
+        if (!p.active) {
+            Projectile.recycle(p);
+            return false;
+        }
+        return true;
+    });
+    this.projectiles.forEach(p => p.update(scaledDt, this.enemies, this.fieldEffects, this.enemyHash));
 
     // 5. 필드 효과 (연막/독성) 업데이트 및 적용
     this.fieldEffects = this.fieldEffects.filter(f => {
       f.duration -= scaledDt;
       
-      // 범위 내의 적들에게 효과 적용
-      this.enemies.forEach(en => {
-        if (en.active && Math.hypot(en.x - f.x, en.y - f.y) <= (f.radius || 60)) {
+      // 범위 내의 적들에게 효과 적용 (SpatialHash 사용)
+      const radius = f.radius || 60;
+      const nearbyEnemies = this.enemyHash ? this.enemyHash.getNearby(f.x, f.y, radius) : this.enemies;
+      
+      nearbyEnemies.forEach(en => {
+        if (en.active && Math.hypot(en.x - f.x, en.y - f.y) <= radius) {
           if (f.type === 'smoke') en.applyEffect('smoke', 0.5, scaledDt);
           if (f.type === 'toxin') en.applyEffect('toxin', 0.5, scaledDt);
           if (f.type === 'molotov') en.applyEffect('molotov', 0.5, scaledDt);

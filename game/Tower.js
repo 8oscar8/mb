@@ -141,7 +141,7 @@ export class Tower {
     return this.baseRange * globalMul;
   }
 
-  update(dt, enemies, addProjectile, globalEffects = { emi: false, luciferium: false }) {
+  update(dt, enemies, addProjectile, globalEffects = { emi: false, luciferium: false }, enemyHash) {
     // 흑점 폭발 체크 (원거리 타워 무력화)
     const isSolarFlare = (this.gameCore.encounterManager && this.gameCore.encounterManager.activeEvents.some(e => e.id === 'solar_flare'));
     const isRanged = this.weaponType === 'ranged';
@@ -213,7 +213,8 @@ export class Tower {
     if (this.cooldown <= 0) {
       const multiTargetEffects = ['multi_bullet', 'instant_multi', 'melee_aoe'];
       if (multiTargetEffects.includes(this.weaponData.effect)) {
-        const targets = enemies.filter(en => en.active && Math.hypot(en.x - this.x, en.y - this.y) <= (this.currentRange || this.range));
+        const searchList = enemyHash ? enemyHash.getNearby(this.x, this.y, this.currentRange || this.range) : enemies;
+        const targets = searchList.filter(en => en.active && Math.hypot(en.x - this.x, en.y - this.y) <= (this.currentRange || this.range));
         if (targets.length > 0) {
           this.target = targets[0]; // [Fix] 광역 공격 시에도 첫 번째 적을 기준으로 휘두르기 방향 결정
           this.fire(targets, addProjectile); // 모든 대상에게 발사
@@ -222,7 +223,7 @@ export class Tower {
           }
         }
       } else {
-        const target = this.findTarget(enemies);
+        const target = this.findTarget(enemies, enemyHash);
         if (target) {
           this.target = target;
           this.fire(target, addProjectile);
@@ -248,14 +249,15 @@ export class Tower {
     }
   }
 
-  /**
-   * 공격 범위 내에서 가장 앞선 적을 탐색
+   * [Optimization] 공간 분할을 사용하여 범위 내에서 가장 앞선 적을 탐색
    */
-  findTarget(enemies) {
+  findTarget(enemies, enemyHash) {
     let bestTarget = null;
     let maxDist = -1;
 
-    for (const enemy of enemies) {
+    const searchList = enemyHash ? enemyHash.getNearby(this.x, this.y, this.currentRange || this.range) : enemies;
+
+    for (const enemy of searchList) {
       if (!enemy.active) continue;
       
       const dx = enemy.x - this.x;
@@ -312,7 +314,7 @@ export class Tower {
         for (let i = 0; i < burstCount; i++) {
           setTimeout(() => {
             if (!t.active) return;
-            const p = new Projectile(
+            const p = Projectile.get(
               this.x, this.y, t, this.damage, this.ap, 
               this.weaponData.effect, SpriteManager.getColor(this.quality),
               this.weaponData.grade,
