@@ -3,13 +3,23 @@
  * 유닛이 발사하는 모든 투사체(Projectile)의 베이스 클래스
  */
 export class Projectile {
+  static pool = [];
+
+  static acquire(x, y, target, damage, ap, effect, color, shooterGrade = 'Common', shred = 0, isTrueDamage = false) {
+    let p;
+    if (this.pool.length > 0) {
+      p = this.pool.pop();
+      p.init(x, y, target, damage, ap, effect, color, shooterGrade, shred, isTrueDamage);
+    } else {
+      p = new Projectile(x, y, target, damage, ap, effect, color, shooterGrade, shred, isTrueDamage);
+    }
+    return p;
+  }
+
   constructor(x, y, target, damage, ap, effect, color, shooterGrade = 'Common', shred = 0, isTrueDamage = false) {
     this.init(x, y, target, damage, ap, effect, color, shooterGrade, shred, isTrueDamage);
   }
 
-  /**
-   * [New] 객체 초기화 (풀링 재사용 대응)
-   */
   init(x, y, target, damage, ap, effect, color, shooterGrade = 'Common', shred = 0, isTrueDamage = false) {
     this.x = x;
     this.y = y;
@@ -19,7 +29,7 @@ export class Projectile {
     this.effect = effect;
     this.color = color;
     this.shooterGrade = shooterGrade;
-    this.shooterName = ""; 
+    this.shooterName = "";
     this.shred = shred || 0;
     this.isTrueDamage = isTrueDamage;
 
@@ -32,27 +42,10 @@ export class Projectile {
       this.radius = (this.effect === 'multi_bullet') ? 2 : 4;
     }
     this.active = true;
-    this.history = []; // 잔상(Tail) 효과 구현을 위한 이동 이력
+    this.history = []; 
   }
 
-  // [New] 객체 풀링 정적 메서드
-  static pool = [];
-  static get(x, y, target, damage, ap, effect, color, shooterGrade, shred, isTrueDamage) {
-    if (this.pool.length > 0) {
-      const p = this.pool.pop();
-      p.init(x, y, target, damage, ap, effect, color, shooterGrade, shred, isTrueDamage);
-      return p;
-    }
-    return new Projectile(x, y, target, damage, ap, effect, color, shooterGrade, shred, isTrueDamage);
-  }
-
-  static recycle(p) {
-    if (this.pool.length < 500) { // 풀 크기 제한
-      this.pool.push(p);
-    }
-  }
-
-  update(dt, enemies = [], fieldEffects = [], enemyHash) {
+  update(dt, enemies = [], fieldEffects = []) {
     if (!this.active) return;
 
     // 특수 잔상 효과 기록
@@ -74,7 +67,7 @@ export class Projectile {
 
     if (distance <= moveDist) {
       this.active = false;
-      this.handleImpact(enemies, fieldEffects, enemyHash);
+      this.handleImpact(enemies, fieldEffects);
     } else if (distance > 0) {
       this.x += (dx / distance) * moveDist;
       this.y += (dy / distance) * moveDist;
@@ -87,16 +80,15 @@ export class Projectile {
   /**
    * 투사체가 적에게 명중했을 때의 처리 분기
    */
-  handleImpact(enemies, fieldEffects, enemyHash) {
+  handleImpact(enemies, fieldEffects) {
     const aoeEffects = ['aoe_dmg', 'aoe_knockback', 'emp', 'smoke', 'burn_fear', 'toxin', 'splash', 'splash_knockback', 'capitalist_rocket'];
     const isAOE = aoeEffects.includes(this.effect);
     
     if (isAOE) {
       // 광역 데미지 범위 설정 (자본주의 로켓은 100, 나머지는 60)
       const radius = (this.effect === 'capitalist_rocket') ? 100 : 60;
-      const searchList = enemyHash ? enemyHash.getNearby(this.x, this.y, radius) : enemies;
       
-      searchList.forEach(en => {
+      enemies.forEach(en => {
          if (en.active && Math.hypot(en.x - this.x, en.y - this.y) <= radius) {
             en.takeDamage(this.damage, this.ap, this.effect, this.shooterGrade, this.shred, this.isTrueDamage, this.shooterName);
          }

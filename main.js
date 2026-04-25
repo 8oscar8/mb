@@ -14,7 +14,47 @@ import { bgmManager } from './engine/BGMManager.js';
 import { ITEM_DB } from './game/WeaponData.js';
 import { TutorialManager } from './core/TutorialManager.js';
 import { Projectile } from './game/Projectile.js';
-import { SpatialHash } from './game/SpatialHash.js';
+
+/**
+ * 공간 분할을 위한 그리드 클래스
+ */
+class SpatialGrid {
+  constructor(width, height, cellSize) {
+    this.cellSize = cellSize;
+    this.cols = Math.ceil(width / cellSize);
+    this.rows = Math.ceil(height / cellSize);
+    this.cells = Array.from({ length: this.cols * this.rows }, () => []);
+  }
+
+  clear() {
+    for (let i = 0; i < this.cells.length; i++) {
+      this.cells[i].length = 0;
+    }
+  }
+
+  register(entity) {
+    const col = Math.floor(entity.x / this.cellSize);
+    const row = Math.floor(entity.y / this.cellSize);
+    if (col >= 0 && col < this.cols && row >= 0 && row < this.rows) {
+      this.cells[row * this.cols + col].push(entity);
+    }
+  }
+
+  getNearbyEntities(x, y, range) {
+    const startCol = Math.floor((x - range) / this.cellSize);
+    const endCol = Math.floor((x + range) / this.cellSize);
+    const startRow = Math.floor((y - range) / this.cellSize);
+    const endRow = Math.floor((y + range) / this.cellSize);
+
+    const entities = [];
+    for (let r = Math.max(0, startRow); r <= Math.min(this.rows - 1, endRow); r++) {
+      for (let c = Math.max(0, startCol); c <= Math.min(this.cols - 1, endCol); c++) {
+        entities.push(...this.cells[r * this.cols + c]);
+      }
+    }
+    return entities;
+  }
+}
 
 // [New] Supabase 초기화
 const SUPABASE_URL = "https://ibgnfoiolxgprsevcfhw.supabase.co";
@@ -48,8 +88,8 @@ class App {
     this.projectiles = [];
     this.fieldEffects = [];
     
-    // [New] 성능 최적화를 위한 공간 분할 해시
-    this.enemyHash = new SpatialHash(800, 800, 80);
+    // [Optimization] 공간 분할 그리드 초기화 (800x800 맵 기준 80px 셀)
+    this.grid = new SpatialGrid(800, 800, 80);
     
     // 4. 배치 모드 및 자원 관련 상태
     this.placementMode = false;
@@ -862,41 +902,39 @@ class App {
 
     // 1. 웨이브 엔진 업데이트
     this.waveManager.update(scaledDt, this.enemies);
-    this.state.nextWaveTimer = this.waveManager.nextWaveTimer;
+    this.state.nextWaveTimer = this.waveManager.nextWaveTimer; // 타이머 동기화
 
     // 2. 적 리스트 정리 및 업데이트
     this.enemies = this.enemies.filter(e => e.active);
-    
-    // [New] 공간 분할 데이터 갱신
-    this.enemyHash.clear();
-    this.enemies.forEach(e => {
-        e.update(scaledDt);
-        this.enemyHash.insert(e);
-    });
+    this.enemies.forEach(e => e.update(scaledDt));
 
-    // 3. 유닛 업데이트 (SpatialHash 전달)
-    this.units.forEach(u => u.update(scaledDt, this.enemies, (p) => this.projectiles.push(p), { emi: false }, this.enemyHash));
+    // [Optimization] 그리드 업데이트
+    this.grid.clear();
+    this.enemies.forEach(e => this.grid.register(e));
 
-    // 4. 투사체 업데이트 및 풀링 회수
+    // 3. 유닛 업데이트 (그리드 전달)
+    this.units.forEach(u => u.update(scaledDt, this.enemies, (p) => this.projectiles.push(p), { 
+        emi: this.encounterManager.activeEvents.some(e => e.id === 'emi_interference'),
+        luciferium: this.encounterManager.activeEvents.some(e => e.id === 'luciferium_rain')
+    }, this.grid));
+
+    // 4. 투사체 업데이트 및 풀링 반납
     this.projectiles = this.projectiles.filter(p => {
         if (!p.active) {
-            Projectile.recycle(p);
+            Projectile.pool.push(p);
             return false;
         }
         return true;
     });
-    this.projectiles.forEach(p => p.update(scaledDt, this.enemies, this.fieldEffects, this.enemyHash));
+    this.projectiles.forEach(p => p.update(scaledDt, this.enemies, this.fieldEffects));
 
     // 5. 필드 효과 (연막/독성) 업데이트 및 적용
     this.fieldEffects = this.fieldEffects.filter(f => {
       f.duration -= scaledDt;
       
-      // 범위 내의 적들에게 효과 적용 (SpatialHash 사용)
-      const radius = f.radius || 60;
-      const nearbyEnemies = this.enemyHash ? this.enemyHash.getNearby(f.x, f.y, radius) : this.enemies;
-      
-      nearbyEnemies.forEach(en => {
-        if (en.active && Math.hypot(en.x - f.x, en.y - f.y) <= radius) {
+      // 범위 내의 적들에게 효과 적용
+      this.enemies.forEach(en => {
+        if (en.active && Math.hypot(en.x - f.x, en.y - f.y) <= (f.radius || 60)) {
           if (f.type === 'smoke') en.applyEffect('smoke', 0.5, scaledDt);
           if (f.type === 'toxin') en.applyEffect('toxin', 0.5, scaledDt);
           if (f.type === 'molotov') en.applyEffect('molotov', 0.5, scaledDt);
