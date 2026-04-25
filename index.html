@@ -187,6 +187,25 @@
                 </div>
                 <!-- [New] 활성 이벤트 표시기 (맵 좌측 하단으로 이동) -->
                 <div id="active-events-container" class="map-event-container"></div>
+
+                <!-- [New] 모바일 전용 상단 실시간 상태 바 -->
+                <div id="mobile-top-stats" class="mobile-only">
+                    <div class="top-stat-item">
+                        <span class="top-label">웨이브</span>
+                        <span id="top-wave-val" class="top-value">1</span>
+                    </div>
+                    <div class="top-stat-divider"></div>
+                    <div class="top-stat-item">
+                        <span class="top-label">다음</span>
+                        <span id="top-timer-val" class="top-value">00:00</span>
+                    </div>
+                    <div class="top-stat-divider"></div>
+                    <div class="top-stat-item">
+                        <span class="top-label">적</span>
+                        <span id="top-enemy-val" class="top-value">0/100</span>
+                    </div>
+                </div>
+
                 <canvas id="game-canvas"></canvas>
             </div>
             <!-- 알림 배너 (가차 결과) -->

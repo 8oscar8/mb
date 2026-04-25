@@ -26,6 +26,11 @@ export class UIManager {
     this.silverVal = document.getElementById('silver-val');
     this.herbalVal = document.getElementById('herbal-val'); // [New] 약초 수치
 
+    // [New] 모바일 전용 상단 실시간 상태 바 요소
+    this.topWaveVal = document.getElementById('top-wave-val');
+    this.topTimerVal = document.getElementById('top-timer-val');
+    this.topEnemyVal = document.getElementById('top-enemy-val');
+
     // 2. 자원 정보
     this.resWood = document.getElementById('res-wood');
     this.resSteel = document.getElementById('res-steel');
@@ -1071,11 +1076,14 @@ export class UIManager {
     }
 
     if (this.waveVal) this.waveVal.textContent = state.waveNumber;
+    if (this.topWaveVal) this.topWaveVal.textContent = state.waveNumber;
     if (this.timerVal) {
       const totalSeconds = Math.max(0, Math.floor(state.nextWaveTimer));
       const mins = Math.floor(totalSeconds / 60);
       const secs = totalSeconds % 60;
-      this.timerVal.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      const timeStr = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+      this.timerVal.textContent = timeStr;
+      if (this.topTimerVal) this.topTimerVal.textContent = timeStr;
 
       // [New] 중앙 대형 카운트다운 연동
       const overlay = document.getElementById('wave-countdown-overlay');
@@ -1169,7 +1177,9 @@ export class UIManager {
 
     if (this.enemyVal) {
       const enemyCount = this.app.enemies ? this.app.enemies.length : 0;
-      this.enemyVal.textContent = `${enemyCount} / 100`;
+      const enemyStr = `${enemyCount} / 100`;
+      this.enemyVal.textContent = enemyStr;
+      if (this.topEnemyVal) this.topEnemyVal.textContent = enemyStr;
       
       // 위험도에 따른 색상 강조
       if (enemyCount >= 80) {

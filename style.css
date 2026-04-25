@@ -1631,6 +1631,13 @@ input[type=range] {
     width: 380px;
 }
 
+/* Utility Classes for Responsive */
+.mobile-only { display: none !important; }
+@media (max-width: 1024px) {
+    .mobile-only { display: flex !important; }
+    .desktop-only { display: none !important; }
+}
+
 /* Mobile UI Rewrite: Integrated Bottom Tab System */
 @media (max-width: 1024px) {
     body {
@@ -2135,7 +2142,53 @@ input[type=range] {
     .upgrade-btn.prod-up .up-info {
         align-items: flex-start !important;
     }
+
+    /* [New] 모바일 상단 실시간 상태 바 스타일 */
+    #mobile-top-stats {
+        position: absolute;
+        top: 10px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        background: rgba(0, 0, 0, 0.7);
+        backdrop-filter: blur(8px);
+        padding: 6px 16px;
+        border-radius: 30px;
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        z-index: 1000;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+        pointer-events: none; /* 클릭 방해 금지 */
+    }
+
+    .top-stat-item {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+    }
+
+    .top-label {
+        font-size: 10px;
+        color: var(--text-muted);
+        text-transform: uppercase;
+        font-weight: 800;
+    }
+
+    .top-value {
+        font-size: 13px;
+        font-weight: 700;
+        color: #fff;
+        font-family: 'Outfit', sans-serif;
+    }
+
+    .top-stat-divider {
+        width: 1px;
+        height: 12px;
+        background: rgba(255, 255, 255, 0.2);
+    }
 }
+
 
 /* 데스크톱에서는 하단 바 숨김 */
 @media (min-width: 1025px) {
