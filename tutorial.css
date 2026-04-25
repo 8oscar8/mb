@@ -203,5 +203,10 @@ body #tutorial-overlay {
         padding: 6px 12px;
         font-size: 0.75rem;
     }
+
+    .pointer-arrow {
+        font-size: 30px !important;
+    }
 }
+
 
